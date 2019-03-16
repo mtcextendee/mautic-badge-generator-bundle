@@ -1,0 +1,1 @@
+# mautic-badge-generator
