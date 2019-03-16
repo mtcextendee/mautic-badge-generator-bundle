@@ -1,0 +1,8 @@
+{
+  "name": "mtcextendee/mautic-badge-generator-bundle",
+  "type": "mautic-plugin",
+  "require": {
+    "mautic/composer-plugin": "^1.0",
+    "setasign/fpdf": "^1.8.1"
+  }
+}
