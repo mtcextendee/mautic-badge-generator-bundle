@@ -1,0 +1,105 @@
+<?php
+
+/*
+ * @copyright   2019 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace MauticPlugin\MauticBadgeGeneratorBundle\Form\Type;
+
+use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Range;
+
+class BadgeType extends AbstractType
+{
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array                $options
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+
+        $builder->addEventSubscriber(new CleanFormSubscriber(['properties' => 'clean']));
+
+        $builder->add(
+            'name',
+            TextType::class,
+            [
+                'label'       => 'mautic.plugin.recommender.form.event.name',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'   => 'form-control',
+                ],
+                'required'    => true,
+                'constraints' => [
+                    new NotBlank(
+                        [
+                            'message' => 'mautic.core.value.required',
+                        ]
+                    )
+                ]
+            ]
+        );
+
+        $builder->add(
+            'source',
+            'file',
+            [
+                'label'      => 'mautic.plugin.badge.generator.form.source',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'class'   => 'form-control',
+                ],
+                'mapped'      => false,
+                'constraints' => [
+                    new File(
+                        [
+                            'mimeTypes' => [
+                                'application/pdf',
+                                'application/x-pdf',
+                            ],
+                            'mimeTypesMessage' => 'mautic.lead.avatar.types_invalid',
+                        ]
+                    ),
+                ],
+            ]
+        );
+
+        $builder->add(
+            'properties',
+            BadgePropertiesType::class,
+            [
+                'label'      => false,
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'class'   => 'form-control',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'buttons',
+            'form_buttons'
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'badge';
+    }
+}
