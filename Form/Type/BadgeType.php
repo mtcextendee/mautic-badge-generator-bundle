@@ -35,7 +35,7 @@ class BadgeType extends AbstractType
             'name',
             TextType::class,
             [
-                'label'       => 'mautic.plugin.recommender.form.event.name',
+                'label'       => 'mautic.plugin.badge.generator.form.name',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => [
                     'class'   => 'form-control',
@@ -73,6 +73,46 @@ class BadgeType extends AbstractType
                         ]
                     ),
                 ],
+            ]
+        );
+
+        $builder->add(
+            'width',
+            NumberType::class,
+            [
+                'label'       => 'mautic.plugin.badge.generator.form.width',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'   => 'form-control',
+                ],
+                'required'    => true,
+                'constraints' => [
+                    new NotBlank(
+                        [
+                            'message' => 'mautic.core.value.required',
+                        ]
+                    )
+                ]
+            ]
+        );
+
+        $builder->add(
+            'height',
+            NumberType::class,
+            [
+                'label'       => 'mautic.plugin.badge.generator.form.height',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'   => 'form-control',
+                ],
+                'required'    => true,
+                'constraints' => [
+                    new NotBlank(
+                        [
+                            'message' => 'mautic.core.value.required',
+                        ]
+                    )
+                ]
             ]
         );
 

@@ -41,6 +41,16 @@ class Badge
     protected $source;
 
     /**
+     * @var int
+     */
+    protected $width = 283;
+
+    /**
+     * @var int
+     */
+    protected $height = 425;
+
+    /**
      * @var \DateTime
      */
     protected $dateAdded;
@@ -61,6 +71,8 @@ class Badge
             ->addId()
             ->addNamedField('name', Type::STRING, 'name')
             ->addNamedField('source', Type::STRING, 'source')
+            ->addNamedField('width', Type::INTEGER, 'width')
+            ->addNamedField('height', Type::INTEGER, 'height')
             ->addNamedField('dateAdded', Type::DATETIME, 'date_added');
 
         $builder->addField('properties', 'json_array');
@@ -199,6 +211,46 @@ class Badge
     public function setProperties($properties)
     {
         $this->properties = $properties;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getWidth()
+    {
+        return $this->width;
+    }
+
+    /**
+     * @param int $width
+     *
+     * @return Badge
+     */
+    public function setWidth($width)
+    {
+        $this->width = $width;
+
+        return $this;
+    }
+
+    /**
+     * @return height
+     */
+    public function getHeight()
+    {
+        return $this->height;
+    }
+
+    /**
+     * @param int $height
+     *
+     * @return Badge
+     */
+    public function setHeight($height)
+    {
+        $this->height = $height;
 
         return $this;
     }

@@ -13,17 +13,12 @@ namespace MauticPlugin\MauticBadgeGeneratorBundle\Generator;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\FileUploader;
-use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Tracker\ContactTracker;
 use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
 use MauticPlugin\MauticBadgeGeneratorBundle\Model\BadgeModel;
 use MauticPlugin\MauticBadgeGeneratorBundle\Uploader\BadgeUploader;
 use setasign\Fpdi\Fpdi;
-use Symfony\Component\Form\Form;
 
 class BadgeGenerator
 {
@@ -62,29 +57,29 @@ class BadgeGenerator
     public function __construct(BadgeModel $badgeModel, LeadModel $leadModel, BadgeUploader $badgeUploader)
     {
 
-        $this->badgeModel = $badgeModel;
-        $this->leadModel = $leadModel;
+        $this->badgeModel    = $badgeModel;
+        $this->leadModel     = $leadModel;
         $this->badgeUploader = $badgeUploader;
     }
 
     /**
      * @param      $badgeId
-     * @param int $leadId
+     * @param int  $leadId
      */
     public function generate($badgeId, $leadId)
     {
         if (!$badge = $this->badgeModel->getEntity($badgeId)) {
             throw new EntityNotFoundException(sprintf('Badge with ID "%s" not exist', $badgeId));
         }
-        $this->badge = $badge;
+        $this->badge   = $badge;
         $this->contact = !empty($leadId) ? $this->leadModel->getEntity($leadId) : null;
 
         $pdf = $this->loadFpdi();
         $pdf->setSourceFile($this->badgeUploader->getCompleteFilePath($badge, $badge->getSource()));
         // import page 1
         $tplIdx = $pdf->importPage(1);
-        $width = 283;
-        $height = 425;
+        $width  = $badge->getWidth();
+        $height = $badge->getHeight();
         $pdf->useTemplate($tplIdx, 0, 0, $width, $height, true);
 
 
@@ -116,6 +111,7 @@ class BadgeGenerator
         $pdf->AddFont('Helvetica-Bold', '', 'helveticab.php');
         $pdf->SetFont('Helvetica-Bold', '', '30');
         $pdf->AddPage();
+
         return $pdf;
     }
 
@@ -131,14 +127,13 @@ class BadgeGenerator
      */
     private function getCustomTextFromFields($block)
     {
-        if ($this->contact) {
-            $fields = $this->badge->getProperties()[$block]['fields'];
-            $text = [];
-            foreach ($fields as $field) {
-                $text[] = $this->contact->getFieldValue($field);
-            }
-            return implode(' ', $text);
+        $fields = $this->badge->getProperties()[$block]['fields'];
+        $text   = [];
+
+        foreach ($fields as $field) {
+            $text[] = $this->contact ? $this->contact->getFieldValue($field) : $field;
         }
-        return $this->badge->getProperties()[$block]['text'];
+
+        return implode(' ', $text);
     }
 }

@@ -113,7 +113,6 @@ class BadgeController extends AbstractStandardFormController
         /** @var BadgeUploader $uploader */
         $uploader = $this->get('mautic.badge.uploader');
         $uploader->uploadFiles($entity, $this->request, $form);
-        //$model->saveEntity($entity);
 
         return true;
     }
@@ -145,7 +144,7 @@ class BadgeController extends AbstractStandardFormController
     public function viewAction($objectId)
     {
         //set the page we came from
-        $page      = $this->get('session')->get('mautic.badge.event.page', 1);
+        $page = 1;
         $returnUrl = $this->generateUrl('mautic_badge_generator_index', ['page' => $page]);
 
         return $this->postActionRedirect(
@@ -155,7 +154,7 @@ class BadgeController extends AbstractStandardFormController
                 'contentTemplate' => 'MauticBadgeGeneratorBundle:Badge:index',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_badge_generator_index',
-                    'mauticContent' => 'badgeGenerator',
+                    'mauticContent' => 'badge',
                 ],
             ]
         );

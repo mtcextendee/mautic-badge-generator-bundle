@@ -62,7 +62,7 @@ class BadgeUploader
      * @param              $request
      * @param Form         $form
      */
-    public function uploadFiles(Badge &$entity, $request, Form $form)
+    public function uploadFiles(Badge $entity, $request, Form $form)
     {
         $files = [];
         if (isset($request->files->all()['badge'])) {

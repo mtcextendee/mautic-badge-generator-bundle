@@ -30,26 +30,6 @@ class BadgeTextType extends AbstractType
     {
 
         $builder->add(
-            'text',
-            TextType::class,
-            [
-                'label'       => 'mautic.plugin.badge.generator.form.text',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
-                    'class'   => 'form-control',
-                ],
-                'required'    => false,
-               /* 'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    )
-                ]*/
-            ]
-        );
-
-        $builder->add(
             'fields',
             LeadFieldsType::class,
             [

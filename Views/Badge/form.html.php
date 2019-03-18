@@ -16,17 +16,31 @@ $view['slots']->start('primaryFormContent');
 /** @var \MauticPlugin\MauticRecommenderBundle\Entity\RecommenderTemplate $recommender */
 $item = $entity;
 ?>
+<style>
+    .btn-save {display:none }
+</style>
 <div class="row">
     <div class="col-md-6">
         <?php echo $view['form']->row($form['name']); ?>
     </div>
+    <div class="col-md-3">
+        <?php echo $view['form']->row($form['width']); ?>
+    </div>
+    <div class="col-md-3">
+        <?php echo $view['form']->row($form['height']); ?>
+    </div>
+
     <div class="col-md-6">
         <?php echo $view['form']->row($form['source']); ?>
+    </div>
+    <div class="col-md-6">
+        <br />
         <?php if ($item->getSource()): ?>
-        <?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.uploaded'); ?>:
-        <a href="<?php echo $uploader->getFullUrl($item, 'source'); ?>" target="_blank">
-            <?php echo $item->getSource(); ?>
-        </a>
+            <?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.uploaded'); ?>:
+            <br />
+            <a href="<?php echo $uploader->getFullUrl($item, 'source'); ?>" target="_blank">
+                <?php echo $item->getSource(); ?>
+            </a>
         <?php endif; ?>
     </div>
 </div>
