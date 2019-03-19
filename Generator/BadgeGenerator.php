@@ -101,6 +101,7 @@ class BadgeGenerator
         // Stage auto mapping
         if ($this->contact && !empty($badge->getStage())) {
             $this->leadModel->addToStages($this->contact, $badge->getStage());
+            $this->leadModel->saveEntity($this->contact);
         }
 
         echo $pdf->Output('custom_pdf_'.time().'.pdf', 'I');
