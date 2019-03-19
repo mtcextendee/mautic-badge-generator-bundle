@@ -11,6 +11,8 @@
 
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Form\Type;
 
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -22,6 +24,23 @@ use Symfony\Component\Validator\Constraints\Range;
 
 class BadgeType extends AbstractType
 {
+
+    /**
+     * @var EntityManager
+     */
+    private $em;
+
+    /**
+     * BadgeType conastructor.
+     *
+     * @param EntityManager $em
+     */
+    public function __construct(EntityManager $em)
+    {
+
+        $this->em = $em;
+    }
+
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -49,6 +68,24 @@ class BadgeType extends AbstractType
                     )
                 ]
             ]
+        );
+
+        $transformer = new IdToEntityModelTransformer(
+            $this->em,
+            'MauticStageBundle:Stage'
+        );
+
+        $builder->add(
+            $builder->create(
+            'stage',
+            'stage_list',
+            [
+                'label'       => 'mautic.plugin.badge.generator.form.stage',
+                'empty_value'=> '',
+                'multiple'=> false,
+                'required'    => false,
+            ]
+        )->addModelTransformer($transformer)
         );
 
         $builder->add(

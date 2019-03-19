@@ -41,6 +41,9 @@ return [
             'mautic.form.type.badge' => [
                 'class' => MauticPlugin\MauticBadgeGeneratorBundle\Form\Type\BadgeType::class,
                 'alias' => 'badge',
+                'arguments'=>[
+                    'doctrine.orm.entity_manager'
+                ]
             ],
         ]
     ],

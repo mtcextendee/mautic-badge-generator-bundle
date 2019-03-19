@@ -98,6 +98,11 @@ class BadgeGenerator
         $pdf->SetTextColor($r, $g, $b);
         $pdf->Cell($width, 50, $this->getCustomText('text2'), 0, 0, 'C');
 
+        // Stage auto mapping
+        if ($this->contact && !empty($badge->getStage())) {
+            $this->leadModel->addToStages($this->contact, $badge->getStage());
+        }
+
         echo $pdf->Output('custom_pdf_'.time().'.pdf', 'I');
         exit;
     }
@@ -108,8 +113,8 @@ class BadgeGenerator
     private function loadFpdi()
     {
         $pdf = new Fpdi();
-        $pdf->AddFont('Helvetica-Bold', '', 'helveticab.php');
-        $pdf->SetFont('Helvetica-Bold', '', '30');
+        $pdf->AddFont('Effra-Medium', '', 'Effra_Md.php');
+        $pdf->SetFont('Effra-Medium', '', '30');
         $pdf->AddPage();
 
         return $pdf;

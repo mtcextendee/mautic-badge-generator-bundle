@@ -3,6 +3,6 @@
   "type": "mautic-plugin",
   "require": {
     "mautic/composer-plugin": "^1.0",
-    "setasign/fpdi-fpdf": "^2.0"
+    "mtcextendee/fpdi-fpdf": "^2.3"
   }
 }

@@ -20,7 +20,7 @@ $item = $entity;
     .btn-save {display:none }
 </style>
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-3">
         <?php echo $view['form']->row($form['name']); ?>
     </div>
     <div class="col-md-3">
@@ -28,6 +28,9 @@ $item = $entity;
     </div>
     <div class="col-md-3">
         <?php echo $view['form']->row($form['height']); ?>
+    </div>
+    <div class="col-md-3">
+        <?php echo $view['form']->row($form['stage']); ?>
     </div>
 
     <div class="col-md-6">

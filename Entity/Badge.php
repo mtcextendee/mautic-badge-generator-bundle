@@ -15,8 +15,7 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Mautic\StageBundle\Entity\Stage;
 
 class Badge
 {
@@ -55,6 +54,9 @@ class Badge
      */
     protected $dateAdded;
 
+    /** @var  Stage */
+    protected $stage;
+
     public function __construct()
     {
         $this->setDateAdded(new \DateTime());
@@ -74,6 +76,11 @@ class Badge
             ->addNamedField('width', Type::INTEGER, 'width')
             ->addNamedField('height', Type::INTEGER, 'height')
             ->addNamedField('dateAdded', Type::DATETIME, 'date_added');
+
+        $builder->createManyToOne('stage', 'Mautic\StageBundle\Entity\Stage')
+            ->inversedBy('log')
+            ->addJoinColumn('stage_id', 'id', true, false, 'CASCADE')
+            ->build();
 
         $builder->addField('properties', 'json_array');
     }
@@ -251,6 +258,26 @@ class Badge
     public function setHeight($height)
     {
         $this->height = $height;
+
+        return $this;
+    }
+
+    /**
+     * @return Stage
+     */
+    public function getStage()
+    {
+        return $this->stage;
+    }
+
+    /**
+     * @param Stage $stage
+     *
+     * @return Badge
+     */
+    public function setStage($stage)
+    {
+        $this->stage = $stage;
 
         return $this;
     }
