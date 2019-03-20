@@ -14,6 +14,8 @@ namespace MauticPlugin\MauticBadgeGeneratorBundle\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\LeadBundle\Form\Type\LeadFieldsType;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -33,7 +35,7 @@ class BadgeType extends AbstractType
     /**
      * BadgeType conastructor.
      *
-     * @param EntityManager $em
+     * @param EntityManager     $em
      */
     public function __construct(EntityManager $em)
     {
@@ -165,6 +167,7 @@ class BadgeType extends AbstractType
                 ],
             ]
         );
+
 
         $builder->add(
             'buttons',

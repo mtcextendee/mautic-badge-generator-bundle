@@ -62,6 +62,18 @@ $item = $entity;
     </div>
 </div>
 
+
+<?php if(!empty($form['properties']['barcode'])): ?>
+<div class="row">
+    <div class="col-md-6">
+        <h4><?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.barcode.generator'); ?></h4>
+        <hr>
+
+        <?php echo $view['form']->widget($form['properties']['barcode']); ?>
+    </div>
+</div>
+<?php endif; ?>
+
 <div class="ide">
     <?php echo $view['form']->rest($form); ?>
 </div>

@@ -34,7 +34,9 @@ return [
                     'mautic.badge.model.badge',
                     'mautic.lead.model.lead',
                     'mautic.badge.uploader',
-                    'mautic.helper.core_parameters'
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.integration',
+                    'router'
                 ],
             ],
         ],
@@ -43,7 +45,13 @@ return [
                 'class' => MauticPlugin\MauticBadgeGeneratorBundle\Form\Type\BadgeType::class,
                 'alias' => 'badge',
                 'arguments'=>[
-                    'doctrine.orm.entity_manager'
+                    'doctrine.orm.entity_manager',
+                ]
+            ],
+            'mautic.form.type.badge.properties' => [
+                'class' => MauticPlugin\MauticBadgeGeneratorBundle\Form\Type\BadgePropertiesType::class,
+                'arguments'=>[
+                    'mautic.helper.integration',
                 ]
             ],
         ]
@@ -80,6 +88,13 @@ return [
                     'route'    => 'mautic_badge_generator_index',
                     'iconClass' => 'fa fa-table',
                     'priority' => 70,
+                    'checks'   => [
+                        'integration' => [
+                            'BadgeGenerator' => [
+                                'enabled' => true,
+                            ],
+                        ],
+                    ],
                 ],
             ],
         ],

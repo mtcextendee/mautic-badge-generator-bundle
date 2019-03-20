@@ -16,10 +16,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
 use MauticPlugin\MauticBadgeGeneratorBundle\Model\BadgeModel;
 use MauticPlugin\MauticBadgeGeneratorBundle\Uploader\BadgeUploader;
 use setasign\Fpdi\Tcpdf\Fpdi;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class BadgeGenerator
 {
@@ -55,20 +58,33 @@ class BadgeGenerator
     private $coreParametersHelper;
 
     /**
+     * @var IntegrationHelper
+     */
+    private $integrationHelper;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
      * BadgeGenerator constructor.
      *
      * @param BadgeModel           $badgeModel
      * @param LeadModel            $leadModel
      * @param BadgeUploader        $badgeUploader
      * @param CoreParametersHelper $coreParametersHelper
+     * @param IntegrationHelper    $integrationHelper
+     * @param RouterInterface      $router
      */
-    public function __construct(BadgeModel $badgeModel, LeadModel $leadModel, BadgeUploader $badgeUploader, CoreParametersHelper $coreParametersHelper)
+    public function __construct(BadgeModel $badgeModel, LeadModel $leadModel, BadgeUploader $badgeUploader, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper, RouterInterface $router)
     {
-
         $this->badgeModel    = $badgeModel;
         $this->leadModel     = $leadModel;
         $this->badgeUploader = $badgeUploader;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->integrationHelper = $integrationHelper;
+        $this->router = $router;
     }
 
     /**
@@ -107,6 +123,26 @@ class BadgeGenerator
         $pdf->SetTextColor($r, $g, $b);
         $pdf->Cell($width, 50, $this->getCustomText('text2'), 0, 0, 'C');
 
+        $integration = $this->integrationHelper->getIntegrationObject('BarcodeGenerator');
+
+        if ($integration && $integration->getIntegrationSettings()->getIsPublished() === true && !empty($badge->getProperties()['barcode']['fields'])) {
+
+            $pdf->SetXY(0, $badge->getProperties()['barcode']['position']);
+
+            $url = $this->router->generate(
+                    'mautic_barcode_generator',
+                    [
+                        'value' => $this->getCustomTextFromFields('barcode'),
+                        'token' => 'barcodeSVG',
+                        'type'=>'C128',
+                        'height'=>$badge->getProperties()['barcode']['height']
+                    ],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
+            $pdf->ImageSVG($url, '', '', '', '', $link='', $align='', $palign='C', $border=0, $fitonpage=false);
+        }
+
+
         // Stage auto mapping
         if ($this->contact && !empty($badge->getStage())) {
             $this->leadModel->addToStages($this->contact, $badge->getStage());
@@ -123,6 +159,9 @@ class BadgeGenerator
     private function loadFpdi()
     {
         $pdf = new Fpdi();
+
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
 
          if ($fontPath = $this->coreParametersHelper->getParameter(self::CUSTOM_FONT_CONFIG_PARAMETER)) {
             $fontName = \TCPDF_FONTS::addTTFfont($fontPath, 'TrueTypeUnicode', '', 96);
@@ -151,8 +190,10 @@ class BadgeGenerator
     private function getCustomTextFromFields($block)
     {
         $fields = $this->badge->getProperties()[$block]['fields'];
+        if (!is_array($fields)) {
+            $fields = [$fields];
+        }
         $text   = [];
-
         foreach ($fields as $field) {
             $text[] = $this->contact ? $this->contact->getFieldValue($field) : $field;
         }

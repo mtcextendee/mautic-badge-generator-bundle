@@ -40,13 +40,6 @@ class BadgeTextType extends AbstractType
                 ],
                 'required'    => true,
                 'multiple'    => true,
-                /*'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    )
-                ]*/
             ]
         );
 

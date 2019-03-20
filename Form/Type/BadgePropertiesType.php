@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -22,6 +23,23 @@ use Symfony\Component\Validator\Constraints\Range;
 
 class BadgePropertiesType extends AbstractType
 {
+
+    /**
+     * @var IntegrationHelper
+     */
+    private $integrationHelper;
+
+    /**
+     * BadgePropertiesType constructor.
+     *
+     * @param IntegrationHelper $integrationHelper
+     */
+    public function __construct(IntegrationHelper $integrationHelper)
+    {
+
+        $this->integrationHelper = $integrationHelper;
+    }
+
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -45,6 +63,20 @@ class BadgePropertiesType extends AbstractType
                 'label'       => false,
             ]
         );
+
+        $integration = $this->integrationHelper->getIntegrationObject('BarcodeGenerator');
+
+        if ($integration && $integration->getIntegrationSettings()->getIsPublished() === true) {
+            $builder->add(
+                'barcode',
+                BadgeBarcodeType::class,
+                [
+                    'label'      => false,
+                    'label_attr' => ['class' => 'control-label'],
+                    'required'   => false,
+                ]
+            );
+        }
 
     }
 }
