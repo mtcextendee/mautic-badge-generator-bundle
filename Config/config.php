@@ -33,7 +33,8 @@ return [
                 'arguments' => [
                     'mautic.badge.model.badge',
                     'mautic.lead.model.lead',
-                    'mautic.badge.uploader'
+                    'mautic.badge.uploader',
+                    'mautic.helper.core_parameters'
                 ],
             ],
         ],
@@ -84,6 +85,7 @@ return [
         ],
     ],
     'parameters' => [
-        'badge_image_directory'               => 'badges',
+        'badge_image_directory'         => 'badges',
+        'badge_custom_font_path_to_ttf' => false,
     ],
 ];

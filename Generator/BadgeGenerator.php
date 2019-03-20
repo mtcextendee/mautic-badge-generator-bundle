@@ -13,15 +13,17 @@ namespace MauticPlugin\MauticBadgeGeneratorBundle\Generator;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
 use MauticPlugin\MauticBadgeGeneratorBundle\Model\BadgeModel;
 use MauticPlugin\MauticBadgeGeneratorBundle\Uploader\BadgeUploader;
-use setasign\Fpdi\Fpdi;
+use setasign\Fpdi\Tcpdf\Fpdi;
 
 class BadgeGenerator
 {
+    CONST CUSTOM_FONT_CONFIG_PARAMETER = 'badge_custom_font_path_to_ttf';
     /**
      * @var BadgeModel
      */
@@ -48,18 +50,25 @@ class BadgeGenerator
     private $badge;
 
     /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
      * BadgeGenerator constructor.
      *
-     * @param BadgeModel    $badgeModel
-     * @param LeadModel     $leadModel
-     * @param BadgeUploader $badgeUploader
+     * @param BadgeModel           $badgeModel
+     * @param LeadModel            $leadModel
+     * @param BadgeUploader        $badgeUploader
+     * @param CoreParametersHelper $coreParametersHelper
      */
-    public function __construct(BadgeModel $badgeModel, LeadModel $leadModel, BadgeUploader $badgeUploader)
+    public function __construct(BadgeModel $badgeModel, LeadModel $leadModel, BadgeUploader $badgeUploader, CoreParametersHelper $coreParametersHelper)
     {
 
         $this->badgeModel    = $badgeModel;
         $this->leadModel     = $leadModel;
         $this->badgeUploader = $badgeUploader;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -114,8 +123,12 @@ class BadgeGenerator
     private function loadFpdi()
     {
         $pdf = new Fpdi();
-        $pdf->AddFont('Effra-Medium', '', 'Effra_Md.php');
-        $pdf->SetFont('Effra-Medium', '', '30');
+
+         if ($fontPath = $this->coreParametersHelper->getParameter(self::CUSTOM_FONT_CONFIG_PARAMETER)) {
+            $fontName = \TCPDF_FONTS::addTTFfont($fontPath, 'TrueTypeUnicode', '', 96);
+            $pdf->SetFont($fontName, '', '30');
+        }
+
         $pdf->AddPage();
 
         return $pdf;
@@ -123,7 +136,11 @@ class BadgeGenerator
 
     private function getCustomText($block)
     {
-        return iconv("UTF-8", "Windows-1250//TRANSLIT", $this->getCustomTextFromFields($block));
+        return $this->getCustomTextFromFields($block);
+        //return utf8_encode('محمد فهد الحواس محمد فهد الحواس محمد فهد الحواس محمد فهد الحواس');
+        //return  iconv('UTF-8', 'windows-1252', 'محمد فهد الحواس محمد فهد الحواس محمد فهد الحواس محمد فهد الحواس');
+        return iconv('UTF-8', 'windows-1252', $this->getCustomTextFromFields($block));;
+        return iconv("UTF-8", "Windows-1252//TRANSLIT", $this->getCustomTextFromFields($block));
     }
 
     /**
