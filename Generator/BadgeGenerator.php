@@ -69,6 +69,9 @@ class BadgeGenerator
      */
     private $router;
 
+    /** @var  string */
+    private $fontName;
+
     /**
      * BadgeGenerator constructor.
      *
@@ -142,6 +145,10 @@ class BadgeGenerator
         $numberOfTextBlocks = ArrayHelper::getValue('numberOfTextBlocks', $integrationSettings, self::NUMBER_OF_DEFAULT_TEXT_BLOCKS);
 
         for ($i = 1; $i <= $numberOfTextBlocks; $i++) {
+            if (empty($badge->getProperties()['text'.$i])) {
+                continue;
+            }
+
             $fields = ArrayHelper::getValue('fields', $badge->getProperties()['text'.$i], false);
             if (empty($fields)) {
                 continue;
@@ -149,6 +156,8 @@ class BadgeGenerator
 
             $position = ArrayHelper::getValue('position', $badge->getProperties()['text'.$i], $i*20);
             $color = ArrayHelper::getValue('color', $badge->getProperties()['text'.$i], '000000');
+            $fontSize = ArrayHelper::getValue('fontSize', $badge->getProperties()['text'.$i], 30);
+            $pdf->SetFont($this->fontName, '', $fontSize);
             // reset position
             $pdf->SetXY(0, $position);
             // set color
@@ -190,8 +199,8 @@ class BadgeGenerator
         $pdf->setPrintFooter(false);
 
          if ($fontPath = $this->coreParametersHelper->getParameter(self::CUSTOM_FONT_CONFIG_PARAMETER)) {
-            $fontName = \TCPDF_FONTS::addTTFfont($fontPath, 'TrueTypeUnicode', '', 96);
-            $pdf->SetFont($fontName, '', '30');
+            $this->fontName = \TCPDF_FONTS::addTTFfont($fontPath, 'TrueTypeUnicode', '', 96);
+            $pdf->SetFont($this->fontName, '', '30');
         }
 
         $pdf->AddPage();
