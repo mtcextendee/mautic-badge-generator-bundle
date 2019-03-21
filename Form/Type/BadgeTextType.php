@@ -38,7 +38,7 @@ class BadgeTextType extends AbstractType
                 'attr'        => [
                     'class'   => 'form-control',
                 ],
-                'required'    => true,
+                'required'    => false,
                 'multiple'    => true,
             ]
         );
@@ -67,14 +67,20 @@ class BadgeTextType extends AbstractType
                 'attr'        => [
                     'class'   => 'form-control',
                 ],
-                'required'    => true,
-                    /*'constraints' => [
-                        new NotBlank(
-                            [
-                                'message' => 'mautic.core.value.required',
-                            ]
-                        )
-                    ]*/
+                'required'    => false,
+            ]
+        );
+
+        $builder->add(
+            'fontSize',
+            TextType::class,
+            [
+                'label'       => 'mautic.plugin.badge.generator.form.font.size',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'   => 'form-control',
+                ],
+                'required'    => false,
             ]
         );
     }

@@ -12,6 +12,7 @@
 
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilder;
 use MauticPlugin\MauticAddressValidatorBundle\Form\Validator\Constraints\AddressValidatorAccess;
@@ -52,5 +53,28 @@ class BadgeGeneratorIntegration extends AbstractIntegration
     public function getAuthenticationType()
     {
         return 'none';
+    }
+
+    /**
+     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
+     * @param array                                             $data
+     * @param string                                            $formArea
+     */
+    public function appendToForm(&$builder, $data, $formArea)
+    {
+        if ($formArea == 'features') {
+            $builder->add(
+                'numberOfTextBlocks',
+                NumberType::class,
+                [
+                    'label'      => 'mautic.plugin.badge.generator.form.number.of.text.blocks',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'        => 'form-control',
+                    ],
+                    'required' => false
+                ]
+            );
+        }
     }
 }

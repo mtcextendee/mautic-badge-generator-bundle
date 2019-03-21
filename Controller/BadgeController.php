@@ -13,6 +13,8 @@ namespace MauticPlugin\MauticBadgeGeneratorBundle\Controller;
 
 use Mautic\CoreBundle\Exception as MauticException;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Helper\ArrayHelper;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
 use MauticPlugin\MauticBadgeGeneratorBundle\Generator\BadgeGenerator;
 use MauticPlugin\MauticBadgeGeneratorBundle\Model\BadgeModel;
@@ -171,11 +173,17 @@ class BadgeController extends AbstractStandardFormController
         $viewParameters = [];
 
         switch ($action) {
+            case 'new':
+            case 'edit':
+            $integrationSettings = $this->get('mautic.helper.integration')->getIntegrationObject('BadgeGenerator')->mergeConfigToFeatureSettings();
+            $viewParameters['numberOfTextBlock'] = ArrayHelper::getValue('numberOfTextBlocks', $integrationSettings, BadgeGenerator::NUMBER_OF_DEFAULT_TEXT_BLOCKS);
             case 'index':
             case 'edit':
              $viewParameters['uploader'] = $this->get('mautic.badge.uploader');
             break;
+
         }
+
         $args['viewParameters'] = array_merge($args['viewParameters'], $viewParameters);
 
         return $args;

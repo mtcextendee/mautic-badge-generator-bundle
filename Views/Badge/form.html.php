@@ -50,17 +50,15 @@ $item = $entity;
 <hr>
 
 <div class="row">
+<?php for($i=1; $i <= $numberOfTextBlock; $i++): ?>
     <div class="col-md-6">
-        <h4><?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.text1'); ?></h4>
+        <h4><?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.text').' '.$i; ?> </h4>
         <hr>
-        <?php echo $view['form']->row($form['properties']['text1']); ?>
+        <?php echo $view['form']->row($form['properties']['text'.$i]); ?>
     </div>
-    <div class="col-md-6">
-        <h4><?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.text2'); ?></h4>
-        <hr>
-        <?php echo $view['form']->row($form['properties']['text2']); ?>
-    </div>
+    <?php endfor; ?>
 </div>
+
 
 
 <?php if(!empty($form['properties']['barcode'])): ?>

@@ -37,7 +37,7 @@ class BadgeBarcodeType extends AbstractType
                 'attr'        => [
                     'class'   => 'form-control',
                 ],
-                'required'    => true,
+                'required'    => false,
                 'empty_value' => '',
                 'multiple'    => false,
             ]
@@ -52,7 +52,20 @@ class BadgeBarcodeType extends AbstractType
                 'attr'        => [
                     'class'   => 'form-control',
                 ],
-                'required'    => true,
+                'required'    => false,
+            ]
+        );
+
+        $builder->add(
+            'width',
+            NumberType::class,
+            [
+                'label'       => 'mautic.plugin.badge.generator.form.barcode.width',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'   => 'form-control',
+                ],
+                'required'    => false,
             ]
         );
 
@@ -65,7 +78,7 @@ class BadgeBarcodeType extends AbstractType
                 'attr'        => [
                     'class'   => 'form-control',
                 ],
-                'required'    => true,
+                'required'    => false,
             ]
         );
     }

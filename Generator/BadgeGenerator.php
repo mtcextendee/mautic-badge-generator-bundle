@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticBadgeGeneratorBundle\Generator;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -27,6 +28,7 @@ use Symfony\Component\Routing\RouterInterface;
 class BadgeGenerator
 {
     CONST CUSTOM_FONT_CONFIG_PARAMETER = 'badge_custom_font_path_to_ttf';
+    CONST NUMBER_OF_DEFAULT_TEXT_BLOCKS = 4;
     /**
      * @var BadgeModel
      */
@@ -108,14 +110,56 @@ class BadgeGenerator
         $pdf->useTemplate($tplIdx, 0, 0, $width, $height, true);
 
 
-        // reset position
-        $pdf->SetXY(0, $badge->getProperties()['text1']['position']);
-        // set color
-        $hex = '#'.$badge->getProperties()['text1']['color'];
-        list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
-        $pdf->SetTextColor($r, $g, $b);
-        // create cell
-        $pdf->Cell($width, 50, $this->getCustomText('text1'), 0, 0, 'C');
+        $integration = $this->integrationHelper->getIntegrationObject('BarcodeGenerator');
+
+        $barcodeFields = ArrayHelper::getValue('fields', $badge->getProperties()['barcode'], false);
+
+        if ($integration && $integration->getIntegrationSettings()->getIsPublished() === true && !empty($barcodeFields)) {
+            $barcodeWidth = ArrayHelper::getValue('width', $badge->getProperties()['barcode'], 120);
+            $barcodeHeight = ArrayHelper::getValue('height', $badge->getProperties()['barcode'], 50);
+            $barcodePosition = ArrayHelper::getValue('position', $badge->getProperties()['barcode'], 50);
+
+            $pdf->SetXY(0, $barcodePosition);
+
+            $url = $this->router->generate(
+                'mautic_barcode_generator',
+                [
+                    'value' => $this->getCustomTextFromFields('barcode'),
+                    'token' => 'barcodePNG',
+                    'type'=>'C128'
+                ],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
+
+
+
+            $pdf->Image($url, '', '', $barcodeWidth, $barcodeHeight, $link='', $align='', '', false, 300, 'C');
+        }
+
+
+
+        $integrationSettings = $this->integrationHelper->getIntegrationObject('BadgeGenerator')->mergeConfigToFeatureSettings();
+        $numberOfTextBlocks = ArrayHelper::getValue('numberOfTextBlocks', $integrationSettings, self::NUMBER_OF_DEFAULT_TEXT_BLOCKS);
+
+        for ($i = 1; $i <= $numberOfTextBlocks; $i++) {
+            $fields = ArrayHelper::getValue('fields', $badge->getProperties()['text'.$i], false);
+            if (empty($fields)) {
+                continue;
+            }
+
+            $position = ArrayHelper::getValue('position', $badge->getProperties()['text'.$i], $i*20);
+            $color = ArrayHelper::getValue('color', $badge->getProperties()['text'.$i], '000000');
+            // reset position
+            $pdf->SetXY(0, $position);
+            // set color
+            $hex = '#'.$color;
+            list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
+            $pdf->SetTextColor($r, $g, $b);
+            // create cell
+            $pdf->Cell($width, 50,$this->getCustomText('text'.$i) , 0, 0, 'C');
+        }
+
+
 
         $pdf->SetXY(0, $badge->getProperties()['text2']['position']);
         $hex = '#'.$badge->getProperties()['text2']['color'];
@@ -123,24 +167,6 @@ class BadgeGenerator
         $pdf->SetTextColor($r, $g, $b);
         $pdf->Cell($width, 50, $this->getCustomText('text2'), 0, 0, 'C');
 
-        $integration = $this->integrationHelper->getIntegrationObject('BarcodeGenerator');
-
-        if ($integration && $integration->getIntegrationSettings()->getIsPublished() === true && !empty($badge->getProperties()['barcode']['fields'])) {
-
-            $pdf->SetXY(0, $badge->getProperties()['barcode']['position']);
-
-            $url = $this->router->generate(
-                    'mautic_barcode_generator',
-                    [
-                        'value' => $this->getCustomTextFromFields('barcode'),
-                        'token' => 'barcodeSVG',
-                        'type'=>'C128',
-                        'height'=>$badge->getProperties()['barcode']['height']
-                    ],
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                );
-            $pdf->ImageSVG($url, '', '', '', '', $link='', $align='', $palign='C', $border=0, $fitonpage=false);
-        }
 
 
         // Stage auto mapping

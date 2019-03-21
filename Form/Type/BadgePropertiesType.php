@@ -11,15 +11,11 @@
 
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Form\Type;
 
-use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticBadgeGeneratorBundle\Generator\BadgeGenerator;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\File;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Range;
 
 class BadgePropertiesType extends AbstractType
 {
@@ -47,22 +43,20 @@ class BadgePropertiesType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
 
-        $builder->add(
-            'text1',
-            BadgeTextType::class,
-            [
-                'label'       => false,
-            ]
-        );
+        $integration = $this->integrationHelper->getIntegrationObject('BadgeGenerator');
 
-
-        $builder->add(
-            'text2',
-            BadgeTextType::class,
-            [
-                'label'       => false,
-            ]
-        );
+        if ($integration && $integration->getIntegrationSettings()->getIsPublished() === true) {
+            $numberOfTextBlocks = ArrayHelper::getValue('numberOfTextBlocks', $integration->mergeConfigToFeatureSettings(), BadgeGenerator::NUMBER_OF_DEFAULT_TEXT_BLOCKS);
+            for ($i = 1; $i <= $numberOfTextBlocks; $i++) {
+                $builder->add(
+                    'text'.$i,
+                    BadgeTextType::class,
+                    [
+                        'label'       => false,
+                    ]
+                );
+            }
+        }
 
         $integration = $this->integrationHelper->getIntegrationObject('BarcodeGenerator');
 

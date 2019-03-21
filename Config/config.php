@@ -102,5 +102,6 @@ return [
     'parameters' => [
         'badge_image_directory'         => 'badges',
         'badge_custom_font_path_to_ttf' => false,
+        'badge_text_block_count' => 4,
     ],
 ];
