@@ -17,6 +17,8 @@ use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\LeadBundle\Entity\Lead;
+use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
 use MauticPlugin\MauticBadgeGeneratorBundle\Model\BadgeModel;
 
 class ButtonSubscriber extends CommonSubscriber
@@ -63,14 +65,18 @@ class ButtonSubscriber extends CommonSubscriber
 
         $this->setEvent($event);
 
-        /** @var Email $object */
+        /** @var Lead $object */
         $object = $event->getItem();
         if (method_exists($object, 'getId')) {
             $this->setObjectId($event->getItem()->getId());
         }
 
         $badges = $this->badgeModel->getEntities();
+        /** @var Badge $badge */
         foreach ($badges as $badge) {
+            if (!$this->displayBadgeInList($object, $badge)) {
+                continue;
+            }
             $this->addButtonGenerator(
                 $badge->getId(),
                 $badge->getName(),
@@ -82,6 +88,27 @@ class ButtonSubscriber extends CommonSubscriber
         }
 
 
+    }
+
+    /**
+     * @param Lead  $contact
+     * @param Badge $badge
+     *
+     * @return bool
+     */
+    private function displayBadgeInList(Lead $contact, Badge $badge)
+    {
+        if (empty($badge->getProperties()['tags'])) {
+            return true;
+        }
+
+        $contactTags = $contact->getTags()->getKeys();
+        foreach ($contactTags as $contactTag) {
+            if (in_array($contactTag, $badge->getProperties()['tags'])) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -102,7 +129,7 @@ class ButtonSubscriber extends CommonSubscriber
             'mautic_badge_generator_generate',
             [
                 'objectId'     => $objectId,
-                'contactId' => $this->getObjectId()
+                'contactId' => $this->getObjectId(),
             ]
         );
 

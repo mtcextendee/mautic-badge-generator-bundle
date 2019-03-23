@@ -52,6 +52,7 @@ return [
                 'class' => MauticPlugin\MauticBadgeGeneratorBundle\Form\Type\BadgePropertiesType::class,
                 'arguments'=>[
                     'mautic.helper.integration',
+                    'translator'
                 ]
             ],
         ]

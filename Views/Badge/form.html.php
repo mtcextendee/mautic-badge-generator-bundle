@@ -33,10 +33,10 @@ $item = $entity;
         <?php echo $view['form']->row($form['stage']); ?>
     </div>
 
-    <div class="col-md-6">
+    <div class="col-md-5">
         <?php echo $view['form']->row($form['source']); ?>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-3">
         <br />
         <?php if ($item->getSource()): ?>
             <?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.uploaded'); ?>:
@@ -45,6 +45,9 @@ $item = $entity;
                 <?php echo $item->getSource(); ?>
             </a>
         <?php endif; ?>
+    </div>
+    <div class="col-md-4">
+        <?php echo $view['form']->row($form['properties']['tags']); ?>
     </div>
 </div>
 <hr>

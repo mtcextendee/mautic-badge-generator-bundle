@@ -16,6 +16,7 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticBadgeGeneratorBundle\Generator\BadgeGenerator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class BadgePropertiesType extends AbstractType
 {
@@ -26,14 +27,20 @@ class BadgePropertiesType extends AbstractType
     private $integrationHelper;
 
     /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
      * BadgePropertiesType constructor.
      *
      * @param IntegrationHelper $integrationHelper
      */
-    public function __construct(IntegrationHelper $integrationHelper)
+    public function __construct(IntegrationHelper $integrationHelper, TranslatorInterface $translator)
     {
 
         $this->integrationHelper = $integrationHelper;
+        $this->translator = $translator;
     }
 
     /**
@@ -71,6 +78,22 @@ class BadgePropertiesType extends AbstractType
                 ]
             );
         }
+
+        $builder->add(
+            'tags',
+            'lead_tag',
+            [
+                'add_transformer' => true,
+                'by_reference'    => false,
+                'label' => 'mautic.plugin.badge.generator.form.tags',
+                'attr'            => [
+                    'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
+                    'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
+                    'data-allow-add'       => 'true',
+                    'onchange'             => 'Mautic.createLeadTag(this)',
+                ],
+            ]
+        );
 
     }
 }
