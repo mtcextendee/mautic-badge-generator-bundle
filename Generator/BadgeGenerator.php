@@ -115,26 +115,31 @@ class BadgeGenerator
 
         $integration = $this->integrationHelper->getIntegrationObject('BarcodeGenerator');
 
+        $barcodeContactId = ArrayHelper::getValue('contactId', $badge->getProperties()['barcode'], false);
         $barcodeFields = ArrayHelper::getValue('fields', $badge->getProperties()['barcode'], false);
 
-        if ($integration && $integration->getIntegrationSettings()->getIsPublished() === true && !empty($barcodeFields)) {
+        if ($integration && $integration->getIntegrationSettings()->getIsPublished() === true && (!empty($barcodeFields || $barcodeContactId))) {
             $barcodeWidth = ArrayHelper::getValue('width', $badge->getProperties()['barcode'], 120);
             $barcodeHeight = ArrayHelper::getValue('height', $badge->getProperties()['barcode'], 50);
             $barcodePosition = ArrayHelper::getValue('position', $badge->getProperties()['barcode'], 50);
 
             $pdf->SetXY(0, $barcodePosition);
 
+            if ($barcodeContactId) {
+                $barcode = $this->getContactFieldValue('id');
+            }else{
+                $barcode = $this->getCustomTextFromFields('barcode');
+            }
+
             $url = $this->router->generate(
                 'mautic_barcode_generator',
                 [
-                    'value' => $this->getCustomTextFromFields('barcode'),
+                    'value' => $barcode,
                     'token' => 'barcodePNG',
                     'type'=>'C128'
                 ],
                 UrlGeneratorInterface::ABSOLUTE_URL
             );
-
-
 
             $pdf->Image($url, '', '', $barcodeWidth, $barcodeHeight, $link='', $align='', '', false, 300, 'C');
         }
@@ -218,6 +223,16 @@ class BadgeGenerator
     }
 
     /**
+     * @param $alias
+     *
+     * @return string
+     */
+    private function getContactFieldValue($alias)
+    {
+        return $this->contact ? $this->contact->getFieldValue($alias) : $alias;
+    }
+
+    /**
      * @param string $block
      *
      * @return string
@@ -230,7 +245,7 @@ class BadgeGenerator
         }
         $text   = [];
         foreach ($fields as $field) {
-            $text[] = $this->contact ? $this->contact->getFieldValue($field) : $field;
+            $text[] = $this->getContactFieldValue($field);
         }
 
         return implode(' ', $text);

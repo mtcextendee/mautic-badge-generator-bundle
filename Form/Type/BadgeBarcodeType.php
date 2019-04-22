@@ -29,6 +29,17 @@ class BadgeBarcodeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
+            'contactId',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.plugin.badge.generator.form.barcode.field.id',
+                'attr'  => [
+                ],
+            ]
+        );
+
+        //badge_properties_barcode_contactId_1
+        $builder->add(
             'fields',
             LeadFieldsType::class,
             [
@@ -36,6 +47,7 @@ class BadgeBarcodeType extends AbstractType
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => [
                     'class'   => 'form-control',
+                    'data-show-on' => '{"badge_properties_barcode_contactId_0":"checked"}',
                 ],
                 'required'    => false,
                 'empty_value' => '',
