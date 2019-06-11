@@ -1,6 +1,7 @@
 # Mautic Badge Generator for Mautic
 
 Plugin from Mautic Extension family ([https://mtcextendee.com](https://mtcextendee.com/))
+Download 7 ultimate free Mautic email themes https://mtcextendee.com/themes/
 
 In general, plugin modify any PDF and add new text custom slots and barcode to PDF. Useful for your events.
 
