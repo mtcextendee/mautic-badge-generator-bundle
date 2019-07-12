@@ -13,10 +13,7 @@
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilder;
-use MauticPlugin\MauticAddressValidatorBundle\Form\Validator\Constraints\AddressValidatorAccess;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 class BadgeGeneratorIntegration extends AbstractIntegration
 {
