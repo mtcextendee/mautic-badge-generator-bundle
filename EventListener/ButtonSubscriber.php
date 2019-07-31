@@ -11,13 +11,12 @@
 
 namespace MauticPlugin\MauticBadgeGeneratorBundle\EventListener;
 
-use JMS\Serializer\Tests\Serializer\EventDispatcher\Subscriber\DoctrineProxySubscriberTest;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
-use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
 use MauticPlugin\MauticBadgeGeneratorBundle\Model\BadgeModel;
 
@@ -33,13 +32,20 @@ class ButtonSubscriber extends CommonSubscriber
     private $badgeModel;
 
     /**
+     * @var IntegrationHelper
+     */
+    private $integrationHelper;
+
+    /**
      * ButtonSubscriber constructor.
      *
-     * @param BadgeModel $badgeModel
+     * @param BadgeModel        $badgeModel
+     * @param IntegrationHelper $integrationHelper
      */
-    public function __construct(BadgeModel $badgeModel)
+    public function __construct(BadgeModel $badgeModel, IntegrationHelper $integrationHelper)
     {
         $this->badgeModel = $badgeModel;
+        $this->integrationHelper = $integrationHelper;
     }
 
 
@@ -56,6 +62,11 @@ class ButtonSubscriber extends CommonSubscriber
      */
     public function injectViewButtons(CustomButtonEvent $event)
     {
+        $integration = $this->integrationHelper->getIntegrationObject('BadgeGenerator');
+        if (!$integration || !$integration->getIntegrationSettings()->getIsPublished()) {
+            return;
+        }
+
         if (FALSE === strpos($event->getRoute(), 'mautic_contact_')) {
             return;
         }

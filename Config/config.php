@@ -11,6 +11,7 @@ return [
                 'class'=> \MauticPlugin\MauticBadgeGeneratorBundle\EventListener\ButtonSubscriber::class,
                 'arguments' => [
                     'mautic.badge.model.badge',
+                    'mautic.helper.integration'
                 ],
             ]
         ],
@@ -36,6 +37,20 @@ return [
                     'mautic.badge.uploader',
                     'mautic.helper.core_parameters',
                     'mautic.helper.integration',
+                    'mautic.badge.barcode.generator',
+                    'mautic.badge.qrcode.generator'
+
+                ],
+            ],
+            'mautic.badge.barcode.generator' => [
+                'class'     => \MauticPlugin\MauticBadgeGeneratorBundle\Generator\BarcodeGenerator::class,
+                'arguments' => [
+                    'router'
+                ],
+            ],
+            'mautic.badge.qrcode.generator' => [
+                'class'     => \MauticPlugin\MauticBadgeGeneratorBundle\Generator\QRcodeGenerator::class,
+                'arguments' => [
                     'router'
                 ],
             ],
@@ -87,7 +102,7 @@ return [
             'items' => [
                 'mautic.plugin.badge.generator' => [
                     'route'    => 'mautic_badge_generator_index',
-                    'iconClass' => 'fa fa-table',
+                    'iconClass' => 'fa fa-id-badge',
                     'priority' => 70,
                     'checks'   => [
                         'integration' => [

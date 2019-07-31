@@ -77,6 +77,16 @@ class BadgePropertiesType extends AbstractType
                     'required'   => false,
                 ]
             );
+
+            $builder->add(
+                'qrcode',
+                BadgeQrcodeType::class,
+                [
+                    'label'      => false,
+                    'label_attr' => ['class' => 'control-label'],
+                    'required'   => false,
+                ]
+            );
         }
 
         $builder->add(

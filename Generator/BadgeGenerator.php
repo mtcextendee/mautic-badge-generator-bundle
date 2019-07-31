@@ -12,18 +12,17 @@
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Generator;
 
 use Doctrine\ORM\EntityNotFoundException;
-use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
+use MauticPlugin\MauticBadgeGeneratorBundle\Generator\Crate\ContactFieldCrate;
+use MauticPlugin\MauticBadgeGeneratorBundle\Generator\Crate\PropertiesCrate;
 use MauticPlugin\MauticBadgeGeneratorBundle\Model\BadgeModel;
 use MauticPlugin\MauticBadgeGeneratorBundle\Uploader\BadgeUploader;
 use setasign\Fpdi\Tcpdf\Fpdi;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 class BadgeGenerator
 {
@@ -64,13 +63,18 @@ class BadgeGenerator
      */
     private $integrationHelper;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
     /** @var  string */
     private $fontName;
+
+    /**
+     * @var BarcodeGenerator
+     */
+    private $barcodeGenerator;
+
+    /**
+     * @var QRcodeGenerator
+     */
+    private $QRcodeGenerator;
 
     /**
      * BadgeGenerator constructor.
@@ -80,16 +84,17 @@ class BadgeGenerator
      * @param BadgeUploader        $badgeUploader
      * @param CoreParametersHelper $coreParametersHelper
      * @param IntegrationHelper    $integrationHelper
-     * @param RouterInterface      $router
+     * @param BarcodeGenerator     $barcodeGenerator
      */
-    public function __construct(BadgeModel $badgeModel, LeadModel $leadModel, BadgeUploader $badgeUploader, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper, RouterInterface $router)
+    public function __construct(BadgeModel $badgeModel, LeadModel $leadModel, BadgeUploader $badgeUploader, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper,  BarcodeGenerator $barcodeGenerator, QRcodeGenerator $QRcodeGenerator)
     {
         $this->badgeModel    = $badgeModel;
         $this->leadModel     = $leadModel;
         $this->badgeUploader = $badgeUploader;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->integrationHelper = $integrationHelper;
-        $this->router = $router;
+        $this->barcodeGenerator = $barcodeGenerator;
+        $this->QRcodeGenerator = $QRcodeGenerator;
     }
 
     /**
@@ -115,35 +120,25 @@ class BadgeGenerator
 
         $integration = $this->integrationHelper->getIntegrationObject('BarcodeGenerator');
 
-        $barcodeContactId = ArrayHelper::getValue('contactId', $badge->getProperties()['barcode'], false);
-        $barcodeFields = ArrayHelper::getValue('fields', $badge->getProperties()['barcode'], false);
+        $barcodeProperties = ArrayHelper::getValue('barcode', $badge->getProperties(), []);
 
-        if ($integration && $integration->getIntegrationSettings()->getIsPublished() === true && (!empty($barcodeFields || $barcodeContactId))) {
-            $barcodeWidth = ArrayHelper::getValue('width', $badge->getProperties()['barcode'], 120);
-            $barcodeHeight = ArrayHelper::getValue('height', $badge->getProperties()['barcode'], 50);
-            $barcodePosition = ArrayHelper::getValue('position', $badge->getProperties()['barcode'], 50);
+        $contactFieldCrate = new ContactFieldCrate($this->contact);
 
-            $pdf->SetXY(0, $barcodePosition);
+        if ($integration && $integration->getIntegrationSettings()->getIsPublished() === true) {
 
-            if ($barcodeContactId) {
-                $barcode = $this->getContactFieldValue('id');
-            }else{
-                $barcode = $this->getCustomTextFromFields('barcode');
+            // barcode
+            $barcodePropertiesCrate = new PropertiesCrate(ArrayHelper::getValue('barcode', $badge->getProperties(), []));
+            if ($barcodePropertiesCrate->isEnabled()) {
+                $this->barcodeGenerator->writeToPdf($pdf, $barcodePropertiesCrate, $contactFieldCrate);
             }
 
-            $url = $this->router->generate(
-                'mautic_barcode_generator',
-                [
-                    'value' => $barcode,
-                    'token' => 'barcodePNG',
-                    'type'=>'C128'
-                ],
-                UrlGeneratorInterface::ABSOLUTE_URL
-            );
+            // qrcode
+            $qrcodePropertiesCrate = new PropertiesCrate(ArrayHelper::getValue('qrcode', $badge->getProperties(), []));
+            if ($qrcodePropertiesCrate->isEnabled()) {
+                $this->QRcodeGenerator->writeToPdf($pdf, $qrcodePropertiesCrate, $contactFieldCrate);
+            }
 
-            $pdf->Image($url, '', '', $barcodeWidth, $barcodeHeight, $link='', $align='', '', false, 300, 'C');
         }
-
 
 
         $integrationSettings = $this->integrationHelper->getIntegrationObject('BadgeGenerator')->mergeConfigToFeatureSettings();
@@ -159,27 +154,33 @@ class BadgeGenerator
                 continue;
             }
 
-            $position = ArrayHelper::getValue('position', $badge->getProperties()['text'.$i], $i*20);
+            $positionY = ArrayHelper::getValue('position', $badge->getProperties()['text'.$i], $i*20);
+            $positionX = ArrayHelper::getValue('positionX', $badge->getProperties()['text'.$i], 0);
+            $align = ArrayHelper::getValue('align', $badge->getProperties()['text'.$i], 'C');
             $color = ArrayHelper::getValue('color', $badge->getProperties()['text'.$i], '000000');
             $fontSize = ArrayHelper::getValue('fontSize', $badge->getProperties()['text'.$i], 30);
-            $pdf->SetFont($this->fontName, '', $fontSize);
+            $font = ArrayHelper::getValue('font', $badge->getProperties()['text'.$i], $this->fontName);
+            $pdf->SetFont($font, '', $fontSize);
+
             // reset position
-            $pdf->SetXY(0, $position);
+            $pdf->SetXY($positionX, $positionY);
             // set color
             $hex = '#'.$color;
             list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
             $pdf->SetTextColor($r, $g, $b);
             // create cell
-            $pdf->Cell($width, 50,$this->getCustomText('text'.$i) , 0, 0, 'C');
+            $pdf->Cell($width, 50,$this->getCustomText('text'.$i) , 0, 0, $align);
         }
 
 
 
-        $pdf->SetXY(0, $badge->getProperties()['text2']['position']);
+
+
+        /*$pdf->SetXY(0, $badge->getProperties()['text2']['position']);
         $hex = '#'.$badge->getProperties()['text2']['color'];
         list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
         $pdf->SetTextColor($r, $g, $b);
-        $pdf->Cell($width, 50, $this->getCustomText('text2'), 0, 0, 'C');
+        $pdf->Cell($width, 50, $this->getCustomText('text2'), 0, 0, 'C');*/
 
 
 

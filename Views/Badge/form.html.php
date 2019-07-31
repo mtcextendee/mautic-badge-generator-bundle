@@ -72,6 +72,12 @@ $item = $entity;
 
         <?php echo $view['form']->widget($form['properties']['barcode']); ?>
     </div>
+    <div class="col-md-6">
+        <h4><?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.qrcode.generator'); ?></h4>
+        <hr>
+
+        <?php echo $view['form']->widget($form['properties']['qrcode']); ?>
+    </div>
 </div>
 <?php endif; ?>
 

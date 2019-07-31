@@ -11,13 +11,14 @@
 
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Form\Type;
 
+use Endroid\QrCode\ErrorCorrectionLevel;
 use Mautic\LeadBundle\Form\Type\LeadFieldsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class BadgeBarcodeType extends AbstractType
+class BadgeQrcodeType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -40,7 +41,7 @@ class BadgeBarcodeType extends AbstractType
             'fields',
             LeadFieldsType::class,
             [
-                'label'       => 'mautic.plugin.badge.generator.form.barcode.field',
+                'label'       => 'mautic.plugin.badge.generator.form.qrcode.field',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => [
                     'class'   => 'form-control',
@@ -74,7 +75,7 @@ class BadgeBarcodeType extends AbstractType
             'position',
             NumberType::class,
             [
-                'label'       => 'mautic.plugin.badge.generator.form.text.position.y',
+                'label'       => 'mautic.plugin.badge.generator.form.text.position.y    ',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => [
                     'class'   => 'form-control',
@@ -97,29 +98,72 @@ class BadgeBarcodeType extends AbstractType
         );
 
         $builder->add(
-            'width',
+            'size',
             NumberType::class,
             [
-                'label'       => 'mautic.plugin.badge.generator.form.barcode.width',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
-                    'class'   => 'form-control',
+                'label'      => 'mautic.plugin.barcode.form.size',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
                 ],
-                'required'    => false,
+                'required' => false
             ]
         );
 
         $builder->add(
-            'height',
+            'margin',
             NumberType::class,
             [
-                'label'       => 'mautic.plugin.badge.generator.form.barcode.height',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
-                    'class'   => 'form-control',
+                'label'      => 'mautic.plugin.barcode.form.margin',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
                 ],
-                'required'    => false,
+                'required' => false
             ]
         );
+
+        $builder->add(
+            'fgcolor',
+            TextType::class,
+            [
+                'label'      => 'mautic.plugin.barcode.form.fgcolor',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'data-toggle' => 'color',
+                ],
+                'required' => false
+            ]
+        );
+
+        $builder->add(
+            'bgcolor',
+            TextType::class,
+            [
+                'label'      => 'mautic.plugin.barcode.form.bgcolor',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'data-toggle' => 'color',
+                ],
+                'required' => false
+            ]
+        );
+
+        $builder->add('error_correction_level', 'choice', [
+            'choices'  => [
+                ErrorCorrectionLevel::LOW=>ErrorCorrectionLevel::LOW,
+                ErrorCorrectionLevel::QUARTILE=>ErrorCorrectionLevel::QUARTILE,
+                ErrorCorrectionLevel::MEDIUM=>ErrorCorrectionLevel::MEDIUM,
+                ErrorCorrectionLevel::HIGH=>ErrorCorrectionLevel::HIGH,
+            ],
+            'label'    => 'mautic.plugin.barcode.form.error_correction_level',
+            'required' => true,
+            'empty_value'=>false,
+            'attr'     => [
+            ],
+        ]);
+
     }
 }
