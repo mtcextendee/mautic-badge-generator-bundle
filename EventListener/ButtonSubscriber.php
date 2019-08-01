@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
 use MauticPlugin\MauticBadgeGeneratorBundle\Model\BadgeModel;
+use MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeUrlGenerator;
 
 class ButtonSubscriber extends CommonSubscriber
 {
@@ -37,15 +38,22 @@ class ButtonSubscriber extends CommonSubscriber
     private $integrationHelper;
 
     /**
+     * @var BadgeUrlGenerator
+     */
+    private $badgeUrlGenerator;
+
+    /**
      * ButtonSubscriber constructor.
      *
      * @param BadgeModel        $badgeModel
      * @param IntegrationHelper $integrationHelper
+     * @param BadgeUrlGenerator $badgeUrlGenerator
      */
-    public function __construct(BadgeModel $badgeModel, IntegrationHelper $integrationHelper)
+    public function __construct(BadgeModel $badgeModel, IntegrationHelper $integrationHelper, BadgeUrlGenerator $badgeUrlGenerator)
     {
         $this->badgeModel = $badgeModel;
         $this->integrationHelper = $integrationHelper;
+        $this->badgeUrlGenerator = $badgeUrlGenerator;
     }
 
 
@@ -64,6 +72,11 @@ class ButtonSubscriber extends CommonSubscriber
     {
         $integration = $this->integrationHelper->getIntegrationObject('BadgeGenerator');
         if (!$integration || !$integration->getIntegrationSettings()->getIsPublished()) {
+            return;
+        }
+        // disabled in plugin settings
+        $settings = $integration->mergeConfigToFeatureSettings();
+        if (!empty($settings['disable_in_contact_list'])) {
             return;
         }
 
@@ -136,13 +149,7 @@ class ButtonSubscriber extends CommonSubscriber
     {
         $event    = $this->getEvent();
 
-        $route    = $this->router->generate(
-            'mautic_badge_generator_generate',
-            [
-                'objectId'     => $objectId,
-                'contactId' => $this->getObjectId(),
-            ]
-        );
+        $route = $this->badgeUrlGenerator->getLink($objectId, $this->getObjectId());
 
         $attr     = [
             'href'        => $route,

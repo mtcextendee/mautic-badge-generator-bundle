@@ -14,15 +14,12 @@ namespace MauticPlugin\MauticBadgeGeneratorBundle\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
-use Mautic\LeadBundle\Form\Type\LeadFieldsType;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Range;
 
 class BadgeType extends AbstractType
 {
@@ -165,6 +162,7 @@ class BadgeType extends AbstractType
                 'attr'       => [
                     'class'   => 'form-control',
                 ],
+                'data'       => $options['data']->getProperties(),
             ]
         );
 

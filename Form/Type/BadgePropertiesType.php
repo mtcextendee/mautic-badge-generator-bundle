@@ -40,7 +40,7 @@ class BadgePropertiesType extends AbstractType
     {
 
         $this->integrationHelper = $integrationHelper;
-        $this->translator = $translator;
+        $this->translator        = $translator;
     }
 
     /**
@@ -53,13 +53,39 @@ class BadgePropertiesType extends AbstractType
         $integration = $this->integrationHelper->getIntegrationObject('BadgeGenerator');
 
         if ($integration && $integration->getIntegrationSettings()->getIsPublished() === true) {
-            $numberOfTextBlocks = ArrayHelper::getValue('numberOfTextBlocks', $integration->mergeConfigToFeatureSettings(), BadgeGenerator::NUMBER_OF_DEFAULT_TEXT_BLOCKS);
+            $settings           = $integration->mergeConfigToFeatureSettings();
+            $numberOfTextBlocks = ArrayHelper::getValue(
+                'numberOfTextBlocks',
+                $settings,
+                BadgeGenerator::NUMBER_OF_DEFAULT_TEXT_BLOCKS
+            );
             for ($i = 1; $i <= $numberOfTextBlocks; $i++) {
                 $builder->add(
                     'text'.$i,
                     BadgeTextType::class,
                     [
-                        'label'       => false,
+                        'label' => false,
+                        'data'  => ArrayHelper::getValue('text'.$i, $options['data']),
+                    ]
+                );
+            }
+
+            $disableInContactList = ArrayHelper::getValue('disable_in_contact_list', $settings, false);
+            if (!$disableInContactList) {
+                $builder->add(
+                    'tags',
+                    'lead_tag',
+                    [
+                        'add_transformer' => true,
+                        'by_reference'    => false,
+                        'label'           => 'mautic.plugin.badge.generator.form.tags',
+                        'attr'            => [
+                            'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
+                            'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
+                            'data-allow-add'       => 'true',
+                            'onchange'             => 'Mautic.createLeadTag(this)',
+                        ],
+                        'data'            => ArrayHelper::getValue('tags', $options['data']),
                     ]
                 );
             }
@@ -75,6 +101,7 @@ class BadgePropertiesType extends AbstractType
                     'label'      => false,
                     'label_attr' => ['class' => 'control-label'],
                     'required'   => false,
+                    'data'       => ArrayHelper::getValue('barcode', $options['data']),
                 ]
             );
 
@@ -85,25 +112,9 @@ class BadgePropertiesType extends AbstractType
                     'label'      => false,
                     'label_attr' => ['class' => 'control-label'],
                     'required'   => false,
+                    'data'       => ArrayHelper::getValue('qrcode', $options['data']),
                 ]
             );
         }
-
-        $builder->add(
-            'tags',
-            'lead_tag',
-            [
-                'add_transformer' => true,
-                'by_reference'    => false,
-                'label' => 'mautic.plugin.badge.generator.form.tags',
-                'attr'            => [
-                    'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
-                    'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
-                    'data-allow-add'       => 'true',
-                    'onchange'             => 'Mautic.createLeadTag(this)',
-                ],
-            ]
-        );
-
     }
 }

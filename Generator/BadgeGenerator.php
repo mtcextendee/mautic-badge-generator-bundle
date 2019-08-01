@@ -101,13 +101,16 @@ class BadgeGenerator
      * @param      $badgeId
      * @param int  $leadId
      */
-    public function generate($badgeId, $leadId)
+    public function generate($badgeId, $leadId, $hash = null)
     {
         if (!$badge = $this->badgeModel->getEntity($badgeId)) {
             throw new EntityNotFoundException(sprintf('Badge with ID "%s" not exist', $badgeId));
         }
         $this->badge   = $badge;
         $this->contact = !empty($leadId) ? $this->leadModel->getEntity($leadId) : null;
+
+
+
 
         $pdf = $this->loadFpdi();
         $pdf->setSourceFile($this->badgeUploader->getCompleteFilePath($badge, $badge->getSource()));

@@ -11,15 +11,12 @@
 
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Controller;
 
-use Mautic\CoreBundle\Exception as MauticException;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Helper\ArrayHelper;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
 use MauticPlugin\MauticBadgeGeneratorBundle\Generator\BadgeGenerator;
-use MauticPlugin\MauticBadgeGeneratorBundle\Model\BadgeModel;
+use MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeHashGenerator;
 use MauticPlugin\MauticBadgeGeneratorBundle\Uploader\BadgeUploader;
-use setasign\Fpdi\Fpdi;
 use Symfony\Component\Form\Form;
 
 class BadgeController extends AbstractStandardFormController
@@ -203,11 +200,17 @@ class BadgeController extends AbstractStandardFormController
      * @param      $objectId
      * @param null $contactId
      */
-    public function generateAction($objectId, $contactId = null)
+    public function generateAction($objectId, $contactId = null, $hash = null)
     {
         /** @var BadgeGenerator $badgeGenerator */
         $badgeGenerator = $this->get('mautic.badge.generator');
-        return $badgeGenerator->generate($objectId, $contactId);
+        /** @var BadgeHashGenerator $hashGenerator */
+        $hashGenerator = $this->get('mautic.badge.hash.generator');
+        if (!$hashGenerator->isValidHash($contactId, $hash)) {
+            return $this->accessDenied();
+
+        }
+        return $badgeGenerator->generate($objectId, $contactId, $hash);
     }
 
 }

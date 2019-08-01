@@ -54,7 +54,6 @@ class ContactFieldCrate
         foreach ($fields as $field) {
             $text[] = $this->getContactFieldValue($field);
         }
-
         return implode(' ', $text);
     }
 }

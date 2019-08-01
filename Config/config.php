@@ -11,7 +11,26 @@ return [
                 'class'=> \MauticPlugin\MauticBadgeGeneratorBundle\EventListener\ButtonSubscriber::class,
                 'arguments' => [
                     'mautic.badge.model.badge',
-                    'mautic.helper.integration'
+                    'mautic.helper.integration',
+                    'mautic.badge.url.generator'
+                ],
+            ],
+            'mautic.badge.page.subscriber' => [
+                'class'     => \MauticPlugin\MauticBadgeGeneratorBundle\EventListener\PageSubscriber::class,
+                'arguments' => [
+                    'mautic.badge.token.replacer'
+                ],
+            ],
+            'mautic.badge.email.subscriber' => [
+                'class'     => \MauticPlugin\MauticBadgeGeneratorBundle\EventListener\EmailSubscriber::class,
+                'arguments' => [
+                    'mautic.badge.token.replacer'
+                ],
+            ],
+            'mautic.badge.token.subscriber' => [
+                'class'     => \MauticPlugin\MauticBadgeGeneratorBundle\EventListener\TokensSubscriber::class,
+                'arguments' => [
+                    'mautic.badge.model.badge'
                 ],
             ]
         ],
@@ -54,6 +73,27 @@ return [
                     'router'
                 ],
             ],
+            'mautic.badge.token.replacer' => [
+                'class'     => \MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeTokenReplacer::class,
+                'arguments' => [
+                    'mautic.badge.url.generator'
+                ],
+            ],
+            'mautic.badge.url.generator' => [
+                'class'     => \MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeUrlGenerator::class,
+                'arguments' => [
+                    'router',
+                    'mautic.badge.hash.generator'
+                ],
+            ],
+
+            'mautic.badge.hash.generator' => [
+                'class'     => \MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeHashGenerator::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.security'
+                ],
+            ],
         ],
         'forms'=>[
             'mautic.form.type.badge' => [
@@ -90,8 +130,11 @@ return [
             ],
 
             'mautic_badge_generator_generate' => [
-                'path'       => '/badge/generator/{objectId}/{contactId}',
+                'path'       => '/badge/generator/{objectId}/{contactId}/{hash}',
                 'controller' => 'MauticBadgeGeneratorBundle:Badge:generate',
+                'defaults'   => [
+                    'hash' => '',
+                ],
             ],
 
 

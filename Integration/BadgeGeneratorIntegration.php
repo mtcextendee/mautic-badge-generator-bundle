@@ -61,15 +61,27 @@ class BadgeGeneratorIntegration extends AbstractIntegration
     {
         if ($formArea == 'features') {
             $builder->add(
+                'disable_in_contact_list',
+                'yesno_button_group',
+                [
+                    'label' => 'mautic.plugin.badge.generator.form.disable_in_contact_list',
+                    'attr'  => [
+                    ],
+                    'data'  => isset($data['disable_in_contact_list']) ? $data['disable_in_contact_list'] : false,
+                ]
+            );
+
+            $builder->add(
                 'numberOfTextBlocks',
                 NumberType::class,
                 [
                     'label'      => 'mautic.plugin.badge.generator.form.number.of.text.blocks',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
-                        'class'        => 'form-control',
+                        'class' => 'form-control',
                     ],
-                    'required' => false
+                    'required'   => false,
+                    'data'       => isset($data['numberOfTextBlocks']) ? $data['numberOfTextBlocks'] : 2,
                 ]
             );
         }

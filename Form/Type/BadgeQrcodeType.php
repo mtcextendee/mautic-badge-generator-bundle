@@ -75,7 +75,7 @@ class BadgeQrcodeType extends AbstractType
             'position',
             NumberType::class,
             [
-                'label'       => 'mautic.plugin.badge.generator.form.text.position.y    ',
+                'label'       => 'mautic.plugin.badge.generator.form.text.position.y',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => [
                     'class'   => 'form-control',

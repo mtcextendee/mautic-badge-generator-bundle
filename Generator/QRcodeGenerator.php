@@ -42,6 +42,11 @@ class QRcodeGenerator
     {
         $pdf->SetXY($propertiesCrate->getPositionX(), $propertiesCrate->getPositionY());
         $code = $contactFieldCrate->getCustomTextFromFields($propertiesCrate->getFields());
+
+        if (empty($code)) {
+            return;
+        }
+
         $properties = $propertiesCrate->getProperties();
         if (!empty($properties['size'])) {
             $properties['size'] = $properties['size'] * 2;

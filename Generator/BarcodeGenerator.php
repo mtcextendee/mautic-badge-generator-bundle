@@ -43,6 +43,10 @@ class BarcodeGenerator
         $pdf->SetXY($propertiesCrate->getPositionX(), $propertiesCrate->getPositionY());
         $code = $contactFieldCrate->getCustomTextFromFields($propertiesCrate->getFields());
 
+        if (empty($code)) {
+            return;
+        }
+
         $url = $this->router->generate(
             'mautic_barcode_generator',
             [
