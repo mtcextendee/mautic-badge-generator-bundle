@@ -15,6 +15,11 @@ In general, plugin modify any PDF and add new text custom slots and barcode to P
     - Require https://github.com/mtcextendee/mautic-barcode-generator-bundle
     - Any custom contact field to generate Barcode
     - Custom position and width/height of barcode
+ - Add QRcode to PDF
+    - Require https://github.com/mtcextendee/mautic-barcode-generator-bundle
+    - Any custom contact field to generate QRcode
+    - Custom position and width/height of barcode, color etc.
+- Token support - use link to badge in email/page (`{badge=1}`)
 - Add to stage after download generate PDF
 - Generate custom PDF for each contacts from contact list
 - Display badge generator bundle just for contact with certain tags
