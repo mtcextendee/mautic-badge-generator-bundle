@@ -18,7 +18,8 @@ return [
             'mautic.badge.page.subscriber' => [
                 'class'     => \MauticPlugin\MauticBadgeGeneratorBundle\EventListener\PageSubscriber::class,
                 'arguments' => [
-                    'mautic.badge.token.replacer'
+                    'mautic.badge.token.replacer',
+                    'mautic.lead.model.lead'
                 ],
             ],
             'mautic.badge.email.subscriber' => [

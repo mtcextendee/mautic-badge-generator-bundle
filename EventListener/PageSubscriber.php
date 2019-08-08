@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticBadgeGeneratorBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeTokenReplacer;
@@ -26,13 +27,20 @@ class PageSubscriber extends CommonSubscriber
     private $badgeTokenReplacer;
 
     /**
+     * @var LeadModel
+     */
+    private $leadModel;
+
+    /**
      * PageSubscriber constructor.
      *
      * @param BadgeTokenReplacer $badgeTokenReplacer
+     * @param LeadModel          $leadModel
      */
-    public function __construct(BadgeTokenReplacer $badgeTokenReplacer)
+    public function __construct(BadgeTokenReplacer $badgeTokenReplacer, LeadModel $leadModel)
     {
         $this->badgeTokenReplacer = $badgeTokenReplacer;
+        $this->leadModel = $leadModel;
     }
 
     /**
