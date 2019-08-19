@@ -45,7 +45,7 @@ class BadgeQrcodeType extends AbstractType
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => [
                     'class'   => 'form-control',
-                    'data-show-on' => '{"badge_properties_barcode_contactId_0":"checked"}',
+                    'data-show-on' => '{"badge_properties_qrcode_contactId_0":"checked"}',
                 ],
                 'required'    => false,
                 'empty_value' => '',
