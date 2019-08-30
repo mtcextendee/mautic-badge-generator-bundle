@@ -56,7 +56,7 @@ class BadgeTokenReplacer
         $tokens = [];
         $contactId = 0;
         if ($contact instanceof Lead && $contact->getId()) {
-            $contactId = $content->getId();
+            $contactId = $contact->getId();
         } elseif (is_array($contact) && !empty($contact['id'])) {
             $contactId = $contact['id'];
         }
