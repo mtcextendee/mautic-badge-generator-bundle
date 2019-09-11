@@ -31,28 +31,33 @@ $item = $entity;
     <div class="col-md-3">
         <?php echo $view['form']->row($form['height']); ?>
     </div>
-    <div class="col-md-3">
-        <?php echo $view['form']->row($form['stage']); ?>
-    </div>
-
-    <div class="col-md-5">
+</div>
+<div class="row">
+    <div class="col-md-6">
         <?php echo $view['form']->row($form['source']); ?>
     </div>
-    <div class="col-md-3">
-        <br/>
+    <div class="col-md-6">
         <?php if ($item->getSource()): ?>
+            <br>
+            <br>
             <?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.uploaded'); ?>:
-            <br/>
             <a href="<?php echo $uploader->getFullUrl($item, 'source'); ?>" target="_blank">
                 <?php echo $item->getSource(); ?>
             </a>
         <?php endif; ?>
     </div>
-    <?php if (!empty($form['properties']['tags'])): ?>
-        <div class="col-md-4">
-            <?php echo $view['form']->row($form['properties']['tags']); ?>
-        </div>
-    <?php endif; ?>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <?php echo $view['form']->row($form['stage']); ?>
+    </div>
+    <div class="col-md-3">
+        <?php echo $view['form']->row($form['properties']['mapping']); ?>
+    </div>
+    <div class="col-md-4">
+        <?php echo $view['form']->row($form['properties']['tags']); ?>
+    </div>
 </div>
 <hr>
 

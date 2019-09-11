@@ -122,14 +122,13 @@ class BadgeTextType extends AbstractType
             'choice',
             [
                 'choices'     => array_combine($coreFonts, $coreFonts),
-                'empty_value' => '',
-                'label'       => 'mautic.plugin.badge.generator.form.text.align',
+                'label'       => 'mautic.plugin.badge.generator.form.font',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => [
                     'class' => 'form-control',
                 ],
+                'empty_value' => '',
                 'required'    => false,
-                'empty_value' => false,
             ]
         );
 

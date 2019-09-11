@@ -99,7 +99,10 @@ class BadgeGenerator
 
     /**
      * @param      $badgeId
-     * @param int  $leadId
+     * @param      $leadId
+     * @param null $hash
+     *
+     * @throws EntityNotFoundException
      */
     public function generate($badgeId, $leadId, $hash = null)
     {
@@ -188,9 +191,16 @@ class BadgeGenerator
 
 
         // Stage auto mapping
-        if ($this->contact && !empty($badge->getStage())) {
-            $this->leadModel->addToStages($this->contact, $badge->getStage());
-            $this->leadModel->saveEntity($this->contact);
+        if ($this->contact) {
+            if (!empty($badge->getStage())) {
+                $this->leadModel->addToStages($this->contact, $badge->getStage());
+            }
+            if (!empty($badge->getProperties()['mapping']['segment'])) {
+                $this->leadModel->addToLists($this->contact, [$badge->getProperties()['mapping']['segment']]);
+            }
+            if (!empty($this->contact->getChanges())) {
+                $this->leadModel->saveEntity($this->contact);
+            }
         }
 
         echo $pdf->Output('custom_pdf_'.time().'.pdf', 'I');

@@ -116,5 +116,17 @@ class BadgePropertiesType extends AbstractType
                 ]
             );
         }
+
+
+        $builder->add(
+            'mapping',
+            BadgeMapping::class,
+            [
+                'label'      => false,
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'data'       => ArrayHelper::getValue('mapping', $options['data']),
+            ]
+        );
     }
 }
