@@ -223,11 +223,11 @@ class BadgeGenerator
             if ($hash) {
                 $image = $this->getCustomImage('image'.$i);
             } else {
-                $image = $this->getCustomImage('image'.$i, 'http://via.placeholder.com/300.png?text=Example');
+                $image = $this->getCustomImage('image'.$i, 'https://placehold.co/300x200.jpg');
             }
 
             if (filter_var($image, FILTER_VALIDATE_URL)) {
-                switch (exif_imagetype($image)) {
+               switch (exif_imagetype($image)) {
                     case IMG_GIF:
                         $type = 'GIF';
                         break;
