@@ -84,6 +84,20 @@ class BadgeGeneratorIntegration extends AbstractIntegration
                     'data'       => isset($data['numberOfTextBlocks']) ? $data['numberOfTextBlocks'] : 2,
                 ]
             );
+
+            $builder->add(
+                'numberOfImagesBlocks',
+                NumberType::class,
+                [
+                    'label'      => 'mautic.plugin.badge.generator.form.number.of.images.blocks',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class' => 'form-control',
+                    ],
+                    'required'   => false,
+                    'data'       => isset($data['numberOfImagesBlocks']) ? $data['numberOfImagesBlocks'] : 0,
+                ]
+            );
         }
     }
 }

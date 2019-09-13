@@ -72,6 +72,17 @@ $item = $entity;
 </div>
 
 
+<div class="row">
+    <?php for ($i = 1; $i <= $numberOfImagesBlock; $i++): ?>
+        <div class="col-md-6">
+            <h4><?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.image').' '.$i; ?> </h4>
+            <hr>
+            <?php echo $view['form']->row($form['properties']['image'.$i]); ?>
+        </div>
+    <?php endfor; ?>
+</div>
+
+
 <?php if (!empty($form['properties']['barcode'])): ?>
     <div class="row">
         <div class="col-md-6">

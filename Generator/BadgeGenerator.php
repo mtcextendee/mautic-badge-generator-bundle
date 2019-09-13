@@ -26,8 +26,12 @@ use setasign\Fpdi\Tcpdf\Fpdi;
 
 class BadgeGenerator
 {
-    CONST CUSTOM_FONT_CONFIG_PARAMETER = 'badge_custom_font_path_to_ttf';
-    CONST NUMBER_OF_DEFAULT_TEXT_BLOCKS = 4;
+    CONST CUSTOM_FONT_CONFIG_PARAMETER    = 'badge_custom_font_path_to_ttf';
+
+    CONST NUMBER_OF_DEFAULT_TEXT_BLOCKS   = 4;
+
+    CONST NUMBER_OF_DEFAULT_IMAGES_BLOCKS = 0;
+
     /**
      * @var BadgeModel
      */
@@ -86,15 +90,22 @@ class BadgeGenerator
      * @param IntegrationHelper    $integrationHelper
      * @param BarcodeGenerator     $barcodeGenerator
      */
-    public function __construct(BadgeModel $badgeModel, LeadModel $leadModel, BadgeUploader $badgeUploader, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper,  BarcodeGenerator $barcodeGenerator, QRcodeGenerator $QRcodeGenerator)
-    {
-        $this->badgeModel    = $badgeModel;
-        $this->leadModel     = $leadModel;
-        $this->badgeUploader = $badgeUploader;
+    public function __construct(
+        BadgeModel $badgeModel,
+        LeadModel $leadModel,
+        BadgeUploader $badgeUploader,
+        CoreParametersHelper $coreParametersHelper,
+        IntegrationHelper $integrationHelper,
+        BarcodeGenerator $barcodeGenerator,
+        QRcodeGenerator $QRcodeGenerator
+    ) {
+        $this->badgeModel           = $badgeModel;
+        $this->leadModel            = $leadModel;
+        $this->badgeUploader        = $badgeUploader;
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->integrationHelper = $integrationHelper;
-        $this->barcodeGenerator = $barcodeGenerator;
-        $this->QRcodeGenerator = $QRcodeGenerator;
+        $this->integrationHelper    = $integrationHelper;
+        $this->barcodeGenerator     = $barcodeGenerator;
+        $this->QRcodeGenerator      = $QRcodeGenerator;
     }
 
     /**
@@ -111,8 +122,6 @@ class BadgeGenerator
         }
         $this->badge   = $badge;
         $this->contact = !empty($leadId) ? $this->leadModel->getEntity($leadId) : null;
-
-
 
 
         $pdf = $this->loadFpdi();
@@ -133,7 +142,9 @@ class BadgeGenerator
         if ($integration && $integration->getIntegrationSettings()->getIsPublished() === true) {
 
             // barcode
-            $barcodePropertiesCrate = new PropertiesCrate(ArrayHelper::getValue('barcode', $badge->getProperties(), []));
+            $barcodePropertiesCrate = new PropertiesCrate(
+                ArrayHelper::getValue('barcode', $badge->getProperties(), [])
+            );
             if ($barcodePropertiesCrate->isEnabled()) {
                 $this->barcodeGenerator->writeToPdf($pdf, $barcodePropertiesCrate, $contactFieldCrate);
             }
@@ -147,8 +158,14 @@ class BadgeGenerator
         }
 
 
-        $integrationSettings = $this->integrationHelper->getIntegrationObject('BadgeGenerator')->mergeConfigToFeatureSettings();
-        $numberOfTextBlocks = ArrayHelper::getValue('numberOfTextBlocks', $integrationSettings, self::NUMBER_OF_DEFAULT_TEXT_BLOCKS);
+        $integrationSettings = $this->integrationHelper->getIntegrationObject(
+            'BadgeGenerator'
+        )->mergeConfigToFeatureSettings();
+        $numberOfTextBlocks  = ArrayHelper::getValue(
+            'numberOfTextBlocks',
+            $integrationSettings,
+            self::NUMBER_OF_DEFAULT_TEXT_BLOCKS
+        );
 
         for ($i = 1; $i <= $numberOfTextBlocks; $i++) {
             if (empty($badge->getProperties()['text'.$i])) {
@@ -160,12 +177,12 @@ class BadgeGenerator
                 continue;
             }
 
-            $positionY = ArrayHelper::getValue('position', $badge->getProperties()['text'.$i], $i*20);
+            $positionY = ArrayHelper::getValue('position', $badge->getProperties()['text'.$i], $i * 20);
             $positionX = ArrayHelper::getValue('positionX', $badge->getProperties()['text'.$i], 0);
-            $align = ArrayHelper::getValue('align', $badge->getProperties()['text'.$i], 'C');
-            $color = ArrayHelper::getValue('color', $badge->getProperties()['text'.$i], '000000');
-            $fontSize = ArrayHelper::getValue('fontSize', $badge->getProperties()['text'.$i], 30);
-            $font = ArrayHelper::getValue('font', $badge->getProperties()['text'.$i], $this->fontName);
+            $align     = ArrayHelper::getValue('align', $badge->getProperties()['text'.$i], 'C');
+            $color     = ArrayHelper::getValue('color', $badge->getProperties()['text'.$i], '000000');
+            $fontSize  = ArrayHelper::getValue('fontSize', $badge->getProperties()['text'.$i], 30);
+            $font      = ArrayHelper::getValue('font', $badge->getProperties()['text'.$i], $this->fontName);
             $pdf->SetFont($font, '', $fontSize);
 
             // reset position
@@ -175,11 +192,77 @@ class BadgeGenerator
             list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
             $pdf->SetTextColor($r, $g, $b);
             // create cell
-            $pdf->Cell($width, 50,$this->getCustomText('text'.$i) , 0, 0, $align);
+            $pdf->Cell($width, 50, $this->getCustomText('text'.$i), 0, 0, $align);
         }
 
 
+        $numberOfImagesBlocks = ArrayHelper::getValue(
+            'numberOfImagesBlocks',
+            $integrationSettings,
+            self::NUMBER_OF_DEFAULT_IMAGES_BLOCKS
+        );
 
+        for ($i = 1; $i <= $numberOfImagesBlocks; $i++) {
+            if (empty($badge->getProperties()['image'.$i])) {
+                continue;
+            }
+
+            $field = ArrayHelper::getValue('fields', $badge->getProperties()['image'.$i], false);
+            if (empty($field)) {
+                continue;
+            }
+
+            $positionY = ArrayHelper::getValue('position', $badge->getProperties()['image'.$i], 0);
+            $positionX = ArrayHelper::getValue('positionX', $badge->getProperties()['image'.$i], 0);
+            $width     = ArrayHelper::getValue('width', $badge->getProperties()['image'.$i], 100);
+            $height    = ArrayHelper::getValue('height', $badge->getProperties()['image'.$i], 100);
+            $align     = ArrayHelper::getValue('align', $badge->getProperties()['image'.$i], 'C');
+
+            // reset position
+            //  $pdf->SetXY($positionX, $positionY);
+            if ($hash) {
+                $image = $this->getCustomImage('image'.$i);
+            } else {
+                $image = $this->getCustomImage('image'.$i, 'http://via.placeholder.com/300.png?text=Example');
+            }
+
+            if (filter_var($image, FILTER_VALIDATE_URL)) {
+                switch (exif_imagetype($image)) {
+                    case IMG_GIF:
+                        $type = 'GIF';
+                        break;
+                    case IMG_JPG:
+                        $type = 'JPG';
+                        break;
+                        break;
+                    case IMG_PNG:
+                    case 3:
+                        $type = 'PNG';
+                        break;
+                    default:
+                        $type = 'JPG';
+                }
+                $pdf->Image(
+                    $image,
+                    $positionX,
+                    $positionY,
+                    $width,
+                    $height,
+                    $type,
+                    '',
+                    '',
+                    true,
+                    150,
+                    '',
+                    false,
+                    false,
+                    0,
+                    true,
+                    false,
+                    false
+                );
+            }
+        }
 
 
         /*$pdf->SetXY(0, $badge->getProperties()['text2']['position']);
@@ -187,7 +270,6 @@ class BadgeGenerator
         list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
         $pdf->SetTextColor($r, $g, $b);
         $pdf->Cell($width, 50, $this->getCustomText('text2'), 0, 0, 'C');*/
-
 
 
         // Stage auto mapping
@@ -217,7 +299,7 @@ class BadgeGenerator
         $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(false);
 
-         if ($fontPath = $this->coreParametersHelper->getParameter(self::CUSTOM_FONT_CONFIG_PARAMETER)) {
+        if ($fontPath = $this->coreParametersHelper->getParameter(self::CUSTOM_FONT_CONFIG_PARAMETER)) {
             $this->fontName = \TCPDF_FONTS::addTTFfont($fontPath, 'TrueTypeUnicode', '', 96);
             $pdf->SetFont($this->fontName, '', '30');
         }
@@ -227,13 +309,30 @@ class BadgeGenerator
         return $pdf;
     }
 
+    /**
+     * @param string $block
+     * @param string $default
+     *
+     * @return string
+     */
+    private function getCustomImage($block, $default = null)
+    {
+        return $this->getCustomTextFromFields($block, $default);
+
+    }
+
+    /**
+     * @param $block
+     *
+     * @return string
+     */
     private function getCustomText($block)
     {
         return $this->getCustomTextFromFields($block);
         //return utf8_encode('محمد فهد الحواس محمد فهد الحواس محمد فهد الحواس محمد فهد الحواس');
         //return  iconv('UTF-8', 'windows-1252', 'محمد فهد الحواس محمد فهد الحواس محمد فهد الحواس محمد فهد الحواس');
-        return iconv('UTF-8', 'windows-1252', $this->getCustomTextFromFields($block));;
-        return iconv("UTF-8", "Windows-1252//TRANSLIT", $this->getCustomTextFromFields($block));
+        //return iconv('UTF-8', 'windows-1252', $this->getCustomTextFromFields($block));;
+        //return iconv("UTF-8", "Windows-1252//TRANSLIT", $this->getCustomTextFromFields($block));
     }
 
     /**
@@ -241,9 +340,9 @@ class BadgeGenerator
      *
      * @return string
      */
-    private function getContactFieldValue($alias)
+    private function getContactFieldValue($alias, $default = null)
     {
-        return $this->contact ? $this->contact->getFieldValue($alias) : $alias;
+        return $this->contact ? $this->contact->getFieldValue($alias) : ($default ? $default : $alias);
     }
 
     /**
@@ -251,15 +350,15 @@ class BadgeGenerator
      *
      * @return string
      */
-    private function getCustomTextFromFields($block)
+    private function getCustomTextFromFields($block, $default = null)
     {
         $fields = $this->badge->getProperties()[$block]['fields'];
         if (!is_array($fields)) {
             $fields = [$fields];
         }
-        $text   = [];
+        $text = [];
         foreach ($fields as $field) {
-            $text[] = $this->getContactFieldValue($field);
+            $text[] = $this->getContactFieldValue($field, $default);
         }
 
         return implode(' ', $text);

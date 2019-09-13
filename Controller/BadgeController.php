@@ -172,8 +172,11 @@ class BadgeController extends AbstractStandardFormController
         switch ($action) {
             case 'new':
             case 'edit':
-            $integrationSettings = $this->get('mautic.helper.integration')->getIntegrationObject('BadgeGenerator')->mergeConfigToFeatureSettings();
-            $viewParameters['numberOfTextBlock'] = ArrayHelper::getValue('numberOfTextBlocks', $integrationSettings, BadgeGenerator::NUMBER_OF_DEFAULT_TEXT_BLOCKS);
+            if ($integration = $this->get('mautic.helper.integration')->getIntegrationObject('BadgeGenerator')) {
+                $integrationSettings = $integration->mergeConfigToFeatureSettings();
+                $viewParameters['numberOfTextBlock'] = ArrayHelper::getValue('numberOfTextBlocks', $integrationSettings, BadgeGenerator::NUMBER_OF_DEFAULT_TEXT_BLOCKS);
+                $viewParameters['numberOfImagesBlock'] = ArrayHelper::getValue('numberOfImagesBlocks', $integrationSettings, BadgeGenerator::NUMBER_OF_DEFAULT_TEXT_BLOCKS);
+            }
             case 'index':
             case 'edit':
              $viewParameters['uploader'] = $this->get('mautic.badge.uploader');

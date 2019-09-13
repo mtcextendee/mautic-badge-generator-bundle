@@ -70,6 +70,22 @@ class BadgePropertiesType extends AbstractType
                 );
             }
 
+            $numberOfImagesBlocks = ArrayHelper::getValue(
+                'numberOfImagesBlocks',
+                $settings,
+                BadgeGenerator::NUMBER_OF_DEFAULT_IMAGES_BLOCKS
+            );
+            for ($i = 1; $i <= $numberOfImagesBlocks; $i++) {
+                $builder->add(
+                    'image'.$i,
+                    BadgeImageType::class,
+                    [
+                        'label' => false,
+                        'data'  => ArrayHelper::getValue('image'.$i, $options['data']),
+                    ]
+                );
+            }
+
             $disableInContactList = ArrayHelper::getValue('disable_in_contact_list', $settings, false);
             if (!$disableInContactList) {
                 $builder->add(
