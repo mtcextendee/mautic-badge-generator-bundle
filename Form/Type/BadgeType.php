@@ -105,7 +105,7 @@ class BadgeType extends AbstractType
                                 'application/pdf',
                                 'application/x-pdf',
                             ],
-                            'mimeTypesMessage' => 'mautic.lead.avatar.types_invalid',
+                            'mimeTypesMessage' => 'mautic.plugin.badge.generator.form.pdf.invalid',
                         ]
                     ),
                 ],

@@ -11,11 +11,13 @@
 
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Form\Type;
 
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\LeadBundle\Form\Type\LeadFieldsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\File;
 
 class BadgeTextType extends AbstractType
 {
@@ -51,25 +53,6 @@ class BadgeTextType extends AbstractType
                     'data-toggle' => 'color',
                 ],
                 'required'   => false,
-            ]
-        );
-
-        $builder->add(
-            'align',
-            'choice',
-            [
-                'choices'     => [
-                    'C' => 'mautic.core.center',
-                    'L' => 'mautic.core.left',
-                ],
-                'label'       => 'mautic.plugin.badge.generator.form.text.align',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
-                    'class' => 'form-control',
-                ],
-                'required'    => false,
-                'data'  => isset($options['data']['align']) ? $options['data']['align'] : 'L',
-                'empty_value' => false,
             ]
         );
 
@@ -116,6 +99,7 @@ class BadgeTextType extends AbstractType
             "dejavuserifi",
             "pdfacourierb",
             "pdfacourieri",
+            "custom",
         ];
 
 
@@ -131,6 +115,53 @@ class BadgeTextType extends AbstractType
                 ],
                 'empty_value' => '',
                 'required'    => false,
+            ]
+        );
+
+
+        $builder->add(
+            'ttf',
+            'file',
+            [
+                'label'      => 'mautic.plugin.badge.generator.form.font.upload',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'data-show-on' => '{"badge_properties_text'.ArrayHelper::getValue('index', $options['data'], '1').'_font":"custom"}',
+
+                ],
+                'mapped'      => false,
+                'constraints' => [
+                    new File(
+                        [
+                            'mimeTypes' => [
+                                'font/ttf',
+                            ],
+                            'mimeTypesMessage' => 'mautic.plugin.badge.generator.form.font.ttf_invalid',
+                        ]
+                    ),
+                ],
+            ]
+        );
+
+
+        $builder->add(
+            'align',
+            'choice',
+            [
+                'choices'     => [
+                    'C' => 'mautic.core.center',
+                    'L' => 'mautic.core.left',
+                ],
+                'label'       => 'mautic.plugin.badge.generator.form.text.align',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class' => 'form-control',
+                ],
+                'required'    => false,
+                'data'  => isset($options['data']['align']) ? $options['data']['align'] : 'L',
+                'empty_value' => false,
             ]
         );
 

@@ -11,12 +11,13 @@
 
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Uploader;
 
-use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileUploader;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Request;
 
 class BadgeUploader
 {
@@ -33,7 +34,7 @@ class BadgeUploader
     /**
      * @var array
      */
-    private $uploadFilesName = ['source'];
+    private $uploadFilesName = ['source', 'ttf'];
 
     /**
      * @var PathsHelper
@@ -58,20 +59,54 @@ class BadgeUploader
     }
 
     /**
-     * @param Badge $entity
-     * @param              $request
-     * @param Form         $form
+     * @param Badge   $entity
+     * @param Request $request
+     *
+     * @return mixed
+     * @throws \Mautic\CoreBundle\Exception\FileUploadException
      */
-    public function uploadFiles(Badge $entity, $request, Form $form)
+    public function uploadPropertiesFiles(Badge $entity, Request $request)
+    {
+        $uploadDir  = $this->getUploadDir($entity);
+        $badge      = ArrayHelper::getValue('badge', $request->files->all(), []);
+        $properties = ArrayHelper::getValue('properties', $badge, []);
+        $files = [];
+        foreach ($properties as $key => $files) {
+            foreach ($this->getUploadFilesName() as $fileName) {
+                /* @var UploadedFile $file */
+                if (empty($files[$fileName])) {
+                    continue;
+                }
+                $file = $files[$fileName];
+                try {
+                    $uploadedFile            = $this->fileUploader->upload($uploadDir, $file);
+                    $properties              = $this->getEntityVar($entity, 'properties');
+                    $properties[$key][$fileName] = $uploadedFile;
+                    $this->getEntityVar($entity, 'properties', 'set', $properties);
+                } catch (FileUploadException $e) {
+                }
+            }
+        }
+
+        return $files;
+    }
+
+    /**
+     * @param Badge   $entity
+     * @param Request $request
+     * @param Form    $form
+     *
+     * @throws \Mautic\CoreBundle\Exception\FileUploadException
+     */
+    public function uploadFiles(Badge $entity, Request $request, Form $form)
     {
         $files = [];
         if (isset($request->files->all()['badge'])) {
             $files = $request->files->all()['badge'];
         }
 
+        $uploadDir = $this->getUploadDir($entity);
         foreach ($this->getUploadFilesName() as $fileName) {
-            $uploadDir = $this->getUploadDir($entity);
-
 
             /* @var UploadedFile $file */
             if (empty($files[$fileName])) {
@@ -88,8 +123,8 @@ class BadgeUploader
     }
 
     /**
-     * @param Badge $entity
-     * @param string       $fileName
+     * @param Badge  $entity
+     * @param string $fileName
      *
      * @return string
      */
@@ -118,8 +153,8 @@ class BadgeUploader
     {
         if ($fileName = $this->getEntityVar($entity, $key)) {
             return $this->coreParametersHelper->getParameter(
-                'site_url'
-            ).DIRECTORY_SEPARATOR.$this->getBadgeImagePath().$fileName;
+                    'site_url'
+                ).DIRECTORY_SEPARATOR.$this->getBadgeImagePath().$fileName;
         }
     }
 
@@ -134,7 +169,7 @@ class BadgeUploader
         if ($action == 'get') {
             return $entity->$var();
         } else {
-            $entity->$var((string) $value);
+            $entity->$var($value);
         }
     }
 
@@ -156,11 +191,11 @@ class BadgeUploader
     private function getBadgeImagePath($fullPath = false)
     {
         return $this->pathsHelper->getSystemPath(
-            'images',
-            $fullPath
-        ).DIRECTORY_SEPARATOR.$this->coreParametersHelper->getParameter(
-            'badge_image_directory'
-        ).DIRECTORY_SEPARATOR;
+                'images',
+                $fullPath
+            ).DIRECTORY_SEPARATOR.$this->coreParametersHelper->getParameter(
+                'badge_image_directory'
+            ).DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -169,5 +204,17 @@ class BadgeUploader
     public function getUploadFilesName()
     {
         return $this->uploadFilesName;
+    }
+
+
+    /**
+     * @param string $string
+     * @param string $prefix
+     *
+     * @return bool
+     */
+    private function startWith($string, $prefix)
+    {
+        return substr($string, 0, strlen($prefix)) == $prefix;
     }
 }

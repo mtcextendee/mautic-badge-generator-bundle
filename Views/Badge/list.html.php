@@ -48,7 +48,7 @@ if ($tmpl == 'index') {
                     [
                         'sessionVar' => 'badge',
                         'orderBy'    => false,
-                        'text'       => 'mautic.plugin.badge.generator.form.uploaded',
+                        'text'       => 'mautic.plugin.badge.generator.form.uploaded_source_pdf',
                         'class'      => 'col-msg-name',
                         'default'    => true,
                     ]

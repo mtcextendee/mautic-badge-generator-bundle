@@ -60,12 +60,14 @@ class BadgePropertiesType extends AbstractType
                 BadgeGenerator::NUMBER_OF_DEFAULT_TEXT_BLOCKS
             );
             for ($i = 1; $i <= $numberOfTextBlocks; $i++) {
+                $data = ArrayHelper::getValue('text'.$i, $options['data']);
+                $data['index'] = $i;
                 $builder->add(
                     'text'.$i,
                     BadgeTextType::class,
                     [
                         'label' => false,
-                        'data'  => ArrayHelper::getValue('text'.$i, $options['data']),
+                        'data'  => $data,
                     ]
                 );
             }

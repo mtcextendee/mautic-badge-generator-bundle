@@ -40,7 +40,7 @@ $item = $entity;
         <?php if ($item->getSource()): ?>
             <br>
             <br>
-            <?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.uploaded'); ?>:
+            <?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.uploaded_source_pdf'); ?>:
             <a href="<?php echo $uploader->getFullUrl($item, 'source'); ?>" target="_blank">
                 <?php echo $item->getSource(); ?>
             </a>
@@ -66,7 +66,22 @@ $item = $entity;
         <div class="col-md-6">
             <h4><?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.text').' '.$i; ?> </h4>
             <hr>
-            <?php echo $view['form']->row($form['properties']['text'.$i]); ?>
+            <div class="row">
+                <?php foreach ($form['properties']['text'.$i] as $alias => $child): ?>
+                    <div class="form-group col-xs-6">
+                        <?php echo $view['form']->label($child); ?>
+                        <?php echo $view['form']->widget($child);
+                        ?>
+                        <?php if ($alias === 'ttf'): ?>
+                            <?php if (isset($item->getProperties()['text'.$i][$alias])): ?>
+                                <div class="pt-5">
+                                    <?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.uploaded'); ?>:
+                                    <?php echo $item->getProperties()['text'.$i][$alias]; ?></div>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         </div>
     <?php endfor; ?>
 </div>
@@ -77,7 +92,14 @@ $item = $entity;
         <div class="col-md-6">
             <h4><?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.image').' '.$i; ?> </h4>
             <hr>
-            <?php echo $view['form']->row($form['properties']['image'.$i]); ?>
+            <div class="row">
+                <?php foreach ($form['properties']['image'.$i] as $alias => $child): ?>
+                <div class="form-group col-xs-6">
+                    <?php echo $view['form']->label($child); ?>
+                    <?php echo $view['form']->widget($child); ?>
+                </div>
+                <?php endforeach; ?>
+            </div>
         </div>
     <?php endfor; ?>
 </div>

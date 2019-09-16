@@ -182,9 +182,15 @@ class BadgeGenerator
             $align     = ArrayHelper::getValue('align', $badge->getProperties()['text'.$i], 'C');
             $color     = ArrayHelper::getValue('color', $badge->getProperties()['text'.$i], '000000');
             $fontSize  = ArrayHelper::getValue('fontSize', $badge->getProperties()['text'.$i], 30);
-            $font      = ArrayHelper::getValue('font', $badge->getProperties()['text'.$i], $this->fontName);
             $stretch      = ArrayHelper::getValue('stretch', $badge->getProperties()['text'.$i], 0);
             $style      = ArrayHelper::getValue('style', $badge->getProperties()['text'.$i], []);
+            $font      = ArrayHelper::getValue('font', $badge->getProperties()['text'.$i], $this->fontName);
+            if ($font == 'custom') {
+                $ttf      = ArrayHelper::getValue('ttf', $badge->getProperties()['text'.$i]);
+                if ($ttf) {
+                    $font = \TCPDF_FONTS::addTTFfont($this->badgeUploader->getCompleteFilePath($badge, $ttf), 'TrueTypeUnicode', '', 96);
+                }
+            }
             $pdf->SetFont($font, implode('', $style), $fontSize);
 
             // reset position

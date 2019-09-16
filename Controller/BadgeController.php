@@ -112,6 +112,7 @@ class BadgeController extends AbstractStandardFormController
         /** @var BadgeUploader $uploader */
         $uploader = $this->get('mautic.badge.uploader');
         $uploader->uploadFiles($entity, $this->request, $form);
+        $uploader->uploadPropertiesFiles($entity, $this->request);
 
         return true;
     }
