@@ -183,7 +183,9 @@ class BadgeGenerator
             $color     = ArrayHelper::getValue('color', $badge->getProperties()['text'.$i], '000000');
             $fontSize  = ArrayHelper::getValue('fontSize', $badge->getProperties()['text'.$i], 30);
             $font      = ArrayHelper::getValue('font', $badge->getProperties()['text'.$i], $this->fontName);
-            $pdf->SetFont($font, '', $fontSize);
+            $stretch      = ArrayHelper::getValue('stretch', $badge->getProperties()['text'.$i], 0);
+            $style      = ArrayHelper::getValue('style', $badge->getProperties()['text'.$i], []);
+            $pdf->SetFont($font, implode('', $style), $fontSize);
 
             // reset position
             $pdf->SetXY($positionX, $positionY);
@@ -192,7 +194,7 @@ class BadgeGenerator
             list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
             $pdf->SetTextColor($r, $g, $b);
             // create cell
-            $pdf->Cell($width, 50, $this->getCustomText('text'.$i), 0, 0, $align);
+            $pdf->Cell($width, 50, $this->getCustomText('text'.$i), 0, 0, $align, false, '', $stretch);
         }
 
 
@@ -250,16 +252,16 @@ class BadgeGenerator
                     $height,
                     $type,
                     '',
-                    '',
-                    true,
+                    'C',
+                    false,
                     150,
-                    '',
+                    $align,
                     false,
                     false,
                     0,
                     true,
                     false,
-                    false
+                    true
                 );
             }
         }

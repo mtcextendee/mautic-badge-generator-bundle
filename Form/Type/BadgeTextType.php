@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticBadgeGeneratorBundle\Form\Type;
 
 use Mautic\LeadBundle\Form\Type\LeadFieldsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -67,6 +68,7 @@ class BadgeTextType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'required'    => false,
+                'data'  => isset($options['data']['align']) ? $options['data']['align'] : 'L',
                 'empty_value' => false,
             ]
         );
@@ -141,6 +143,7 @@ class BadgeTextType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
+                'data'  => isset($options['data']['position']) ? $options['data']['position'] : 0,
                 'required'   => false,
             ]
         );
@@ -154,6 +157,7 @@ class BadgeTextType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
+                'data'  => isset($options['data']['positionX']) ? $options['data']['positionX'] : 0,
                 'required'   => false,
             ]
         );
@@ -167,7 +171,42 @@ class BadgeTextType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
+                'data'  => isset($options['data']['fontSize']) ? $options['data']['fontSize'] : 30,
                 'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'stretch',
+            NumberType::class,
+            [
+                'label'      => 'mautic.plugin.badge.generator.form.text.stretch',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+                'data'  => isset($options['data']['stretch']) ? $options['data']['stretch'] : 0,
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'style',
+            'choice',
+            [
+                'choices'     => [
+                    'B' => 'mautic.plugin.badge.generator.form.text.bold',
+                    'I' => 'mautic.plugin.badge.generator.form.text.italic',
+                    'U' => 'mautic.plugin.badge.generator.form.text.underline',
+                ],
+                'label'       => 'mautic.plugin.badge.generator.form.text.style',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class' => 'form-control',
+                ],
+                'required'    => false,
+                'data'  => isset($options['data']['style']) ? $options['data']['style'] : [],
+                'multiple' => true,
             ]
         );
     }

@@ -41,6 +41,25 @@ class BadgeImageType extends AbstractType
         );
 
         $builder->add(
+            'align',
+            'choice',
+            [
+                'choices' => [
+                    'C'=>'mautic.core.center',
+                    'L'=>'mautic.core.left',
+                    'R'=>'mautic.core.right',
+                ],
+                'label'      => 'mautic.plugin.badge.generator.form.text.align',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                ],
+                'required'    => false,
+                'empty_value' => false,
+            ]
+        );
+
+        $builder->add(
             'width',
             NumberType::class,
             [
