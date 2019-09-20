@@ -58,7 +58,9 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.helper.integration',
                     'mautic.badge.barcode.generator',
-                    'mautic.badge.qrcode.generator'
+                    'mautic.badge.qrcode.generator',
+                    'templating.helper.assets',
+                    'mautic.helper.paths'
 
                 ],
             ],

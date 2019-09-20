@@ -14,6 +14,8 @@ namespace MauticPlugin\MauticBadgeGeneratorBundle\Generator;
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -81,6 +83,16 @@ class BadgeGenerator
     private $QRcodeGenerator;
 
     /**
+     * @var AssetsHelper
+     */
+    private $assetsHelper;
+
+    /**
+     * @var PathsHelper
+     */
+    private $pathsHelper;
+
+    /**
      * BadgeGenerator constructor.
      *
      * @param BadgeModel           $badgeModel
@@ -89,6 +101,9 @@ class BadgeGenerator
      * @param CoreParametersHelper $coreParametersHelper
      * @param IntegrationHelper    $integrationHelper
      * @param BarcodeGenerator     $barcodeGenerator
+     * @param QRcodeGenerator      $QRcodeGenerator
+     * @param AssetsHelper         $assetsHelper
+     * @param PathsHelper          $pathsHelper
      */
     public function __construct(
         BadgeModel $badgeModel,
@@ -97,7 +112,9 @@ class BadgeGenerator
         CoreParametersHelper $coreParametersHelper,
         IntegrationHelper $integrationHelper,
         BarcodeGenerator $barcodeGenerator,
-        QRcodeGenerator $QRcodeGenerator
+        QRcodeGenerator $QRcodeGenerator,
+        AssetsHelper $assetsHelper,
+        PathsHelper $pathsHelper
     ) {
         $this->badgeModel           = $badgeModel;
         $this->leadModel            = $leadModel;
@@ -106,6 +123,8 @@ class BadgeGenerator
         $this->integrationHelper    = $integrationHelper;
         $this->barcodeGenerator     = $barcodeGenerator;
         $this->QRcodeGenerator      = $QRcodeGenerator;
+        $this->assetsHelper         = $assetsHelper;
+        $this->pathsHelper = $pathsHelper;
     }
 
     /**
@@ -176,19 +195,23 @@ class BadgeGenerator
             if (empty($fields)) {
                 continue;
             }
-
             $positionY = ArrayHelper::getValue('position', $badge->getProperties()['text'.$i], $i * 20);
             $positionX = ArrayHelper::getValue('positionX', $badge->getProperties()['text'.$i], 0);
             $align     = ArrayHelper::getValue('align', $badge->getProperties()['text'.$i], 'C');
             $color     = ArrayHelper::getValue('color', $badge->getProperties()['text'.$i], '000000');
             $fontSize  = ArrayHelper::getValue('fontSize', $badge->getProperties()['text'.$i], 30);
-            $stretch      = ArrayHelper::getValue('stretch', $badge->getProperties()['text'.$i], 0);
-            $style      = ArrayHelper::getValue('style', $badge->getProperties()['text'.$i], []);
+            $stretch   = ArrayHelper::getValue('stretch', $badge->getProperties()['text'.$i], 0);
+            $style     = ArrayHelper::getValue('style', $badge->getProperties()['text'.$i], []);
             $font      = ArrayHelper::getValue('font', $badge->getProperties()['text'.$i], $this->fontName);
             if ($font == 'custom') {
-                $ttf      = ArrayHelper::getValue('ttf', $badge->getProperties()['text'.$i]);
+                $ttf = ArrayHelper::getValue('ttf', $badge->getProperties()['text'.$i]);
                 if ($ttf) {
-                    $font = \TCPDF_FONTS::addTTFfont($this->badgeUploader->getCompleteFilePath($badge, $ttf), 'TrueTypeUnicode', '', 96);
+                    $font = \TCPDF_FONTS::addTTFfont(
+                        $this->badgeUploader->getCompleteFilePath($badge, $ttf),
+                        'TrueTypeUnicode',
+                        '',
+                        96
+                    );
                 }
             }
             $pdf->SetFont($font, implode('', $style), $fontSize);
@@ -228,14 +251,19 @@ class BadgeGenerator
 
             // reset position
             //  $pdf->SetXY($positionX, $positionY);
+            $image = '';
             if ($hash) {
-                $image = $this->getCustomImage('image'.$i);
+                if (!empty($this->badge->getProperties()['image'.$i]['avatar'])) {
+                   $image = $this->getAvatar();
+                } else {
+                    $image = $this->getCustomImage('image'.$i);
+                }
             } else {
                 $image = $this->getCustomImage('image'.$i, 'https://placehold.co/300x200.jpg');
             }
 
             if (filter_var($image, FILTER_VALIDATE_URL)) {
-               switch (exif_imagetype($image)) {
+                switch (exif_imagetype($image)) {
                     case IMG_GIF:
                         $type = 'GIF';
                         break;
@@ -326,7 +354,6 @@ class BadgeGenerator
     private function getCustomImage($block, $default = null)
     {
         return $this->getCustomTextFromFields($block, $default);
-
     }
 
     /**
@@ -370,5 +397,42 @@ class BadgeGenerator
         }
 
         return implode(' ', $text);
+    }
+
+
+    /**
+     * @return string
+     */
+    private function getAvatar()
+    {
+        $preferred = $this->contact->getPreferredProfileImage();
+
+        if ($preferred == 'custom') {
+            $avatarPath = $this->getAvatarPath(true).'/avatar'.$this->contact->getId();
+            if (file_exists($avatarPath) && $fmtime = filemtime($avatarPath)) {
+                // Append file modified time to ensure the latest is used by browser
+                return $this->assetsHelper->getUrl(
+                    $this->getAvatarPath().'/avatar'.$this->contact->getId().'?'.$fmtime,
+                    null,
+                    null,
+                    true,
+                    true
+                );
+            }
+        }
+    }
+
+    /**
+     * Get avatar path.
+     *
+     * @param $absolute
+     *
+     * @return string
+     */
+    private function getAvatarPath($absolute = false)
+    {
+        $imageDir = $this->pathsHelper->getSystemPath('images', $absolute);
+
+        return $imageDir.'/lead_avatars';
     }
 }

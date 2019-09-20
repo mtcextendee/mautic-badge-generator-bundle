@@ -27,6 +27,17 @@ class BadgeImageType extends AbstractType
     {
 
         $builder->add(
+            'avatar',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.plugin.badge.generator.form.avatar',
+                'attr'  => [
+                ],
+                'data'  => isset($options['data']['avatar']) ? $options['data']['avatar'] : false,
+            ]
+        );
+
+        $builder->add(
             'fields',
             LeadFieldsType::class,
             [
@@ -34,6 +45,7 @@ class BadgeImageType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class' => 'form-control',
+                    'data-show-on' => '{"badge_properties_image'.$options['data']['index'].'_avatar_0":"checked"}',
                 ],
                 'required'   => false,
                 'multiple'   => false,
