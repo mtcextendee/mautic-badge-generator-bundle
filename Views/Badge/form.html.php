@@ -110,14 +110,26 @@ $item = $entity;
         <div class="col-md-6">
             <h4><?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.barcode.generator'); ?></h4>
             <hr>
-
-            <?php echo $view['form']->widget($form['properties']['barcode']); ?>
+            <div class="row">
+                <?php foreach ($form['properties']['barcode'] as $alias => $child): ?>
+                    <div class="form-group col-xs-6">
+                        <?php echo $view['form']->label($child); ?>
+                        <?php echo $view['form']->widget($child); ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         </div>
         <div class="col-md-6">
             <h4><?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.qrcode.generator'); ?></h4>
             <hr>
-
-            <?php echo $view['form']->widget($form['properties']['qrcode']); ?>
+            <div class="row">
+                <?php foreach ($form['properties']['qrcode'] as $alias => $child): ?>
+                    <div class="form-group col-xs-6">
+                        <?php echo $view['form']->label($child); ?>
+                        <?php echo $view['form']->widget($child); ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         </div>
     </div>
 <?php endif; ?>

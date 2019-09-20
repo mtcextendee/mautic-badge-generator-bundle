@@ -108,7 +108,6 @@ class BadgeController extends AbstractStandardFormController
             return true;
         }
 
-        $model =  $this->getModel('badge.badge');
         /** @var BadgeUploader $uploader */
         $uploader = $this->get('mautic.badge.uploader');
         $uploader->uploadFiles($entity, $this->request, $form);
@@ -176,7 +175,7 @@ class BadgeController extends AbstractStandardFormController
             if ($integration = $this->get('mautic.helper.integration')->getIntegrationObject('BadgeGenerator')) {
                 $integrationSettings = $integration->mergeConfigToFeatureSettings();
                 $viewParameters['numberOfTextBlock'] = ArrayHelper::getValue('numberOfTextBlocks', $integrationSettings, BadgeGenerator::NUMBER_OF_DEFAULT_TEXT_BLOCKS);
-                $viewParameters['numberOfImagesBlock'] = ArrayHelper::getValue('numberOfImagesBlocks', $integrationSettings, BadgeGenerator::NUMBER_OF_DEFAULT_TEXT_BLOCKS);
+                $viewParameters['numberOfImagesBlock'] = ArrayHelper::getValue('numberOfImagesBlocks', $integrationSettings, BadgeGenerator::NUMBER_OF_DEFAULT_IMAGES_BLOCKS);
             }
             case 'index':
             case 'edit':

@@ -32,6 +32,7 @@ class BadgeBarcodeType extends AbstractType
                 'label' => 'mautic.plugin.badge.generator.form.barcode.field.id',
                 'attr'  => [
                 ],
+                'data'  => isset($options['data']['contactId']) ? $options['data']['contactId'] : false,
             ]
         );
 
