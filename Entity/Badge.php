@@ -100,10 +100,10 @@ class Badge
                     'source',
                     'dateAdded',
                 ]
-            ) ->addProperties(
+            )->addProperties(
                 [
                     'properties',
-                    ]
+                ]
             )
             ->build();
     }

@@ -21,6 +21,10 @@ use Symfony\Component\Form\Form;
 
 class BadgeController extends AbstractStandardFormController
 {
+    /**
+     * @var string
+     */
+    private $source;
 
     /**
      * {@inheritdoc}
@@ -90,11 +94,22 @@ class BadgeController extends AbstractStandardFormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
-       return parent::editStandard($objectId, $ignorePost);
+        return parent::editStandard($objectId, $ignorePost);
     }
 
     /**
-     * @param Badge $entity
+     * @param Badge $badge
+     * @param Badge $oldBadge
+     *
+     * @return array|void
+     */
+    protected function afterEntityClone($badge, $oldBadge)
+    {
+        $this->get('session')->set('clonedSource', $oldBadge->getSource());
+    }
+
+    /**
+     * @param Badge    $entity
      * @param Form     $form
      * @param          $action
      * @param null     $objectId
@@ -104,14 +119,16 @@ class BadgeController extends AbstractStandardFormController
      */
     protected function beforeEntitySave($entity, Form $form, $action, $objectId = null, $isClone = false)
     {
-        if ($isClone) {
-            return true;
-        }
-
         /** @var BadgeUploader $uploader */
         $uploader = $this->get('mautic.badge.uploader');
         $uploader->uploadFiles($entity, $this->request, $form);
         $uploader->uploadPropertiesFiles($entity, $this->request);
+
+        if ($isClone && !$entity->getSource()) {
+            if ($this->get('session')->has('clonedSource')) {
+                $entity->setSource($this->get('session')->get('clonedSource'));
+            }
+        }
 
         return true;
     }
@@ -132,7 +149,7 @@ class BadgeController extends AbstractStandardFormController
      */
     public function newAction()
     {
-      return  $this->newStandard();
+        return $this->newStandard();
     }
 
     /**
@@ -143,7 +160,7 @@ class BadgeController extends AbstractStandardFormController
     public function viewAction($objectId)
     {
         //set the page we came from
-        $page = 1;
+        $page      = 1;
         $returnUrl = $this->generateUrl('mautic_badge_generator_index', ['page' => $page]);
 
         return $this->postActionRedirect(
@@ -172,15 +189,23 @@ class BadgeController extends AbstractStandardFormController
         switch ($action) {
             case 'new':
             case 'edit':
-            if ($integration = $this->get('mautic.helper.integration')->getIntegrationObject('BadgeGenerator')) {
-                $integrationSettings = $integration->mergeConfigToFeatureSettings();
-                $viewParameters['numberOfTextBlock'] = ArrayHelper::getValue('numberOfTextBlocks', $integrationSettings, BadgeGenerator::NUMBER_OF_DEFAULT_TEXT_BLOCKS);
-                $viewParameters['numberOfImagesBlock'] = ArrayHelper::getValue('numberOfImagesBlocks', $integrationSettings, BadgeGenerator::NUMBER_OF_DEFAULT_IMAGES_BLOCKS);
-            }
+                if ($integration = $this->get('mautic.helper.integration')->getIntegrationObject('BadgeGenerator')) {
+                    $integrationSettings                   = $integration->mergeConfigToFeatureSettings();
+                    $viewParameters['numberOfTextBlock']   = ArrayHelper::getValue(
+                        'numberOfTextBlocks',
+                        $integrationSettings,
+                        BadgeGenerator::NUMBER_OF_DEFAULT_TEXT_BLOCKS
+                    );
+                    $viewParameters['numberOfImagesBlock'] = ArrayHelper::getValue(
+                        'numberOfImagesBlocks',
+                        $integrationSettings,
+                        BadgeGenerator::NUMBER_OF_DEFAULT_IMAGES_BLOCKS
+                    );
+                }
             case 'index':
             case 'edit':
-             $viewParameters['uploader'] = $this->get('mautic.badge.uploader');
-            break;
+                $viewParameters['uploader'] = $this->get('mautic.badge.uploader');
+                break;
 
         }
 
@@ -213,6 +238,7 @@ class BadgeController extends AbstractStandardFormController
             return $this->accessDenied();
 
         }
+
         return $badgeGenerator->generate($objectId, $contactId, $hash);
     }
 
