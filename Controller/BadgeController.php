@@ -106,6 +106,7 @@ class BadgeController extends AbstractStandardFormController
     protected function afterEntityClone($badge, $oldBadge)
     {
         $this->get('session')->set('clonedSource', $oldBadge->getSource());
+        $this->get('session')->set('clonedProperties', $oldBadge->getProperties());
     }
 
     /**
@@ -124,9 +125,20 @@ class BadgeController extends AbstractStandardFormController
         $uploader->uploadFiles($entity, $this->request, $form);
         $uploader->uploadPropertiesFiles($entity, $this->request);
 
-        if ($isClone && !$entity->getSource()) {
-            if ($this->get('session')->has('clonedSource')) {
+        if ($isClone) {
+            if (!$entity->getSource() && $this->get('session')->has('clonedSource')) {
                 $entity->setSource($this->get('session')->get('clonedSource'));
+            }
+            if ($this->get('session')->has('clonedProperties')) {
+                $properties = $entity->getProperties();
+                foreach ($properties as $key => $property) {
+                    if ('custom' === ArrayHelper::getValue('font', $property) &&
+                        !ArrayHelper::getValue('ttf', $property)) {
+                        $clonedProperties        = $this->get('session')->get('clonedProperties');
+                        $properties[$key]['ttf'] = $clonedProperties[$key]['ttf'];
+                    }
+                }
+                $entity->setProperties($properties);
             }
         }
 
