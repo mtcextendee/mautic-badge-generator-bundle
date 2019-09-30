@@ -74,13 +74,6 @@ $item = $entity;
                         <?php echo $view['form']->label($child); ?>
                         <?php echo $view['form']->widget($child);
                         ?>
-                        <?php if ($alias === 'ttf'): ?>
-                            <?php if (isset($item->getProperties()['text'.$i][$alias])): ?>
-                                <div class="pt-5">
-                                    <?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.uploaded'); ?>:
-                                    <?php echo $item->getProperties()['text'.$i][$alias]; ?></div>
-                            <?php endif; ?>
-                        <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
             </div>

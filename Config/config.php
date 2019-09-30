@@ -117,6 +117,7 @@ return [
                 'class' => \MauticPlugin\MauticBadgeGeneratorBundle\Form\Type\BadgeTextType::class,
                 'arguments'=>[
                     'mautic.lead.model.field',
+                    'mautic.badge.uploader'
                 ]
             ],
         ]

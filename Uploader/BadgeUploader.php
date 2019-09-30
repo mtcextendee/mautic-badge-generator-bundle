@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileUploader;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -34,7 +35,9 @@ class BadgeUploader
     /**
      * @var array
      */
-    private $uploadFilesName = ['source', 'ttf'];
+    private $uploadFilesName = ['source', 'ttf_upload'];
+
+    private $suffixForUpload = '_upload';
 
     /**
      * @var PathsHelper
@@ -81,7 +84,7 @@ class BadgeUploader
                 try {
                     $uploadedFile            = $this->fileUploader->upload($uploadDir, $file);
                     $properties              = $this->getEntityVar($entity, 'properties');
-                    $properties[$key][$fileName] = $uploadedFile;
+                    $properties[$key][str_replace($this->suffixForUpload, '', $fileName)] = $uploadedFile;
                     $this->getEntityVar($entity, 'properties', 'set', $properties);
                 } catch (FileUploadException $e) {
                 }
@@ -204,6 +207,19 @@ class BadgeUploader
     public function getUploadFilesName()
     {
         return $this->uploadFilesName;
+    }
+
+    /**
+     * @param string $pattern
+     *
+     * @return Finder
+     */
+    public function getUploadedFiles($pattern = '*')
+    {
+        $path = $this->getBadgeImagePath(true);
+        $finder = new Finder();
+        return $finder->files()->name($pattern)->in($path);
+
     }
 
 

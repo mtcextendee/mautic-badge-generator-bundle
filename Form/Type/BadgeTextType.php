@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticBadgeGeneratorBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\LeadBundle\Model\FieldModel;
+use MauticPlugin\MauticBadgeGeneratorBundle\Uploader\BadgeUploader;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -31,14 +32,21 @@ class BadgeTextType extends AbstractType
     private $fieldModel;
 
     /**
+     * @var BadgeUploader
+     */
+    private $badgeUploader;
+
+    /**
      * BadgeTextType constructor.
      *
-     * @param FieldModel $fieldModel
+     * @param FieldModel    $fieldModel
+     * @param BadgeUploader $badgeUploader
      */
-    public function __construct(FieldModel $fieldModel)
+    public function __construct(FieldModel $fieldModel, BadgeUploader $badgeUploader)
     {
 
         $this->fieldModel = $fieldModel;
+        $this->badgeUploader = $badgeUploader;
     }
     /**
      * @param FormBuilderInterface $builder
@@ -69,7 +77,7 @@ class BadgeTextType extends AbstractType
                     'required'   => false,
                     'multiple'   => true,
                     'expanded'    => false,
-                    'data' => $orderColumns
+                    'data' => $orderColumns,
                 ]
             );
         };
@@ -169,8 +177,31 @@ class BadgeTextType extends AbstractType
         );
 
 
+
+        /** @var \SplFileInfo $uploadedFile */
+        $ttfs = [];
+        foreach ($this->badgeUploader->getUploadedFiles('*.ttf') as $uploadedFile) {
+            $filename = $uploadedFile->getFilename();
+            $ttfs[$filename] = $filename;
+        }
         $builder->add(
             'ttf',
+            ChoiceType::class,
+            [
+                'choices'     => $ttfs,
+                'label'       => 'mautic.plugin.badge.generator.form.font.uploaded_fonts',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class' => 'form-control',
+                    'data-show-on' => '{"badge_properties_text'.ArrayHelper::getValue('index', $options['data'], '1').'_font":"custom"}',
+                ],
+                'empty_value' => '',
+                'required'    => false,
+            ]
+        );
+
+        $builder->add(
+            'ttf_upload',
             'file',
             [
                 'label'      => 'mautic.plugin.badge.generator.form.font.upload',
