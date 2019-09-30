@@ -12,15 +12,34 @@
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
-use Mautic\LeadBundle\Form\Type\LeadFieldsType;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraints\File;
 
 class BadgeTextType extends AbstractType
 {
+    /**
+     * @var FieldModel
+     */
+    private $fieldModel;
+
+    /**
+     * BadgeTextType constructor.
+     *
+     * @param FieldModel $fieldModel
+     */
+    public function __construct(FieldModel $fieldModel)
+    {
+
+        $this->fieldModel = $fieldModel;
+    }
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -28,18 +47,49 @@ class BadgeTextType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
 
-        $builder->add(
-            'fields',
-            LeadFieldsType::class,
-            [
-                'label'      => 'mautic.plugin.badge.generator.form.fields',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class' => 'form-control',
-                ],
-                'required'   => false,
-                'multiple'   => true,
-            ]
+        $formModifier = function (FormInterface $form, $currentColumns) {
+            $order = [];
+            $orderColumns = [];
+            if (!empty($currentColumns)) {
+                $orderColumns = array_values($currentColumns);
+                $order        = htmlspecialchars(json_encode($orderColumns), ENT_QUOTES, 'UTF-8');
+            }
+            $form->add(
+                'fields',
+                ChoiceType::class,
+                [
+                    'label'      => 'mautic.plugin.badge.generator.form.fields',
+                    'label_attr' => ['class' => 'control-label'],
+                    'choices'=> $this->fieldModel->getFieldList(false),
+                    'attr'       => [
+                        'class' => 'form-control multiselect',
+                        'data-sortable' => 'true',
+                        'data-order'    => $order,
+                    ],
+                    'required'   => false,
+                    'multiple'   => true,
+                    'expanded'    => false,
+                    'data' => $orderColumns
+                ]
+            );
+        };
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            function (FormEvent $event) use ($formModifier) {
+                $data = $event->getData();
+                $columns = isset($data['fields']) ? $data['fields'] : [];
+                $formModifier($event->getForm(), $columns);
+            }
+        );
+        // Build the columns selector
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) use ($formModifier) {
+                $data    = $event->getData();
+                $columns = isset($data['fields']) ? $data['fields'] : [];
+
+                $formModifier($event->getForm(), $columns);
+            }
         );
 
         $builder->add(

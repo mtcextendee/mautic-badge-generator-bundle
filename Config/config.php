@@ -113,6 +113,12 @@ return [
                     'translator'
                 ]
             ],
+            'mautic.form.type.badge.properties.text' => [
+                'class' => \MauticPlugin\MauticBadgeGeneratorBundle\Form\Type\BadgeTextType::class,
+                'arguments'=>[
+                    'mautic.lead.model.field',
+                ]
+            ],
         ]
     ],
     'routes'      => [

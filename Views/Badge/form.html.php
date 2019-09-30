@@ -66,6 +66,8 @@ $item = $entity;
         <div class="col-md-6">
             <h4><?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.text').' '.$i; ?> </h4>
             <hr>
+            <?php echo $view['form']->row($form['properties']['text'.$i]['fields']); ?>
+
             <div class="row">
                 <?php foreach ($form['properties']['text'.$i] as $alias => $child): ?>
                     <div class="form-group col-xs-6">
