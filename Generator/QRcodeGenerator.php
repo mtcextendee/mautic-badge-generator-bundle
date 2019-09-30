@@ -60,15 +60,14 @@ class QRcodeGenerator
             ],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
-
         $pdf->Image(
             $url,
             $propertiesCrate->getPositionX(),
             $propertiesCrate->getPositionY(),
             $propertiesCrate->getWidth(),
             $propertiesCrate->getWidth(),
-            $link = '',
-            $align = '',
+            '',
+            '',
             '',
             false,
             300,

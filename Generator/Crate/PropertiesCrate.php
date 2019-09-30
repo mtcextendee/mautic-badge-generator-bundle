@@ -90,7 +90,7 @@ class PropertiesCrate
      */
     public function getAlign()
     {
-        return ArrayHelper::getValue('align', $this->properties, 'C');
+        return ArrayHelper::getValue('align', $this->properties, 'C') == 'C' ? ArrayHelper::getValue('align', $this->properties, 'C') : '';
     }
 
     /**

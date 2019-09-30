@@ -59,7 +59,7 @@ class BadgeBarcodeType extends AbstractType
             [
                 'choices' => [
                     'C'=>'mautic.core.center',
-                    'L'=>'mautic.core.left',
+                    ''=>'mautic.core.left',
                 ],
                 'label'      => 'mautic.plugin.badge.generator.form.text.align',
                 'label_attr' => ['class' => 'control-label'],

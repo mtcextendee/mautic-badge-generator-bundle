@@ -78,7 +78,7 @@ class BadgeGenerator
     private $barcodeGenerator;
 
     /**
-     * @var QRcodeGenerator
+     * @var qrcodegenerator
      */
     private $QRcodeGenerator;
 
