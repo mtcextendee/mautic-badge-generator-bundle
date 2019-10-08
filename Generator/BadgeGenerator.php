@@ -248,6 +248,9 @@ class BadgeGenerator
             $width     = ArrayHelper::getValue('width', $badge->getProperties()['image'.$i], 100);
             $height    = ArrayHelper::getValue('height', $badge->getProperties()['image'.$i], 100);
             $align     = ArrayHelper::getValue('align', $badge->getProperties()['image'.$i], 'C');
+            if($align !== 'C') {
+                $align = '';
+            }
 
             // reset position
             //  $pdf->SetXY($positionX, $positionY);

@@ -58,8 +58,7 @@ class BadgeImageType extends AbstractType
             [
                 'choices' => [
                     'C'=>'mautic.core.center',
-                    'L'=>'mautic.core.left',
-                    'R'=>'mautic.core.right',
+                    '' => 'mautic.core.left',
                 ],
                 'label'      => 'mautic.plugin.badge.generator.form.text.align',
                 'label_attr' => ['class' => 'control-label'],
