@@ -124,7 +124,7 @@ class BadgeGenerator
         $this->barcodeGenerator     = $barcodeGenerator;
         $this->QRcodeGenerator      = $QRcodeGenerator;
         $this->assetsHelper         = $assetsHelper;
-        $this->pathsHelper = $pathsHelper;
+        $this->pathsHelper          = $pathsHelper;
     }
 
     /**
@@ -132,9 +132,16 @@ class BadgeGenerator
      * @param      $leadId
      * @param null $hash
      *
+     * @param bool $isAdmin
+     *
      * @throws EntityNotFoundException
+     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
+     * @throws \setasign\Fpdi\PdfParser\Filter\FilterException
+     * @throws \setasign\Fpdi\PdfParser\PdfParserException
+     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
+     * @throws \setasign\Fpdi\PdfReader\PdfReaderException
      */
-    public function generate($badgeId, $leadId, $hash = null)
+    public function generate($badgeId, $leadId, $hash = null, $isAdmin = false)
     {
         if (!$badge = $this->badgeModel->getEntity($badgeId)) {
             throw new EntityNotFoundException(sprintf('Badge with ID "%s" not exist', $badgeId));
@@ -142,6 +149,9 @@ class BadgeGenerator
         $this->badge   = $badge;
         $this->contact = !empty($leadId) ? $this->leadModel->getEntity($leadId) : null;
 
+        if ($this->contact && !$isAdmin) {
+            $this->displayBadge($this->contact, $badge);
+        }
 
         $pdf = $this->loadFpdi();
         $pdf->setSourceFile($this->badgeUploader->getCompleteFilePath($badge, $badge->getSource()));
@@ -248,7 +258,7 @@ class BadgeGenerator
             $width     = ArrayHelper::getValue('width', $badge->getProperties()['image'.$i], 100);
             $height    = ArrayHelper::getValue('height', $badge->getProperties()['image'.$i], 100);
             $align     = ArrayHelper::getValue('align', $badge->getProperties()['image'.$i], 'C');
-            if($align !== 'C') {
+            if ($align !== 'C') {
                 $align = '';
             }
 
@@ -257,7 +267,7 @@ class BadgeGenerator
             $image = '';
             if ($hash) {
                 if (!empty($this->badge->getProperties()['image'.$i]['avatar'])) {
-                   $image = $this->getAvatar();
+                    $image = $this->getAvatar();
                 } else {
                     $image = $this->getCustomImage('image'.$i);
                 }
@@ -438,4 +448,65 @@ class BadgeGenerator
 
         return $imageDir.'/lead_avatars';
     }
+
+    /**
+     * @param Lead  $contact
+     * @param Badge $badge
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function displayBadge(Lead $contact, Badge $badge)
+    {
+        $this->displaBasedOnTags($contact, $badge);
+        $this->displayBasedOnSegment($contact, $badge);
+    }
+
+    /**
+     * @param Lead  $contact
+     * @param Badge $badge
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    private function displayBasedOnSegment(Lead $contact, Badge $badge)
+    {
+        $segments = ArrayHelper::getValue('segment', $badge->getProperties()['restriction'], []);
+        if (empty($segments)) {
+            return true;
+        }
+        $contactSegments = $this->leadModel->getLists($contact);
+        foreach ($contactSegments as $contactSegment) {
+            if (in_array($contactSegment->getId(), $segments)) {
+                return true;
+            }
+        }
+
+        throw new \Exception('Access denied');
+    }
+
+    /**
+     * @param Lead  $contact
+     * @param Badge $badge
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    private function displaBasedOnTags(Lead $contact, Badge $badge)
+    {
+        $tags = ArrayHelper::getValue('tags', $badge->getProperties()['tags']);
+        if (empty($tags)) {
+            return true;
+        }
+
+        $contactTags = $contact->getTags()->getKeys();
+        foreach ($contactTags as $contactTag) {
+            if (in_array($contactTag, $badge->getProperties()['tags'])) {
+                return true;
+            }
+        }
+
+        throw new \Exception('Access denied');
+    }
+
 }

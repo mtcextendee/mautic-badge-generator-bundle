@@ -12,7 +12,8 @@ return [
                 'arguments' => [
                     'mautic.badge.model.badge',
                     'mautic.helper.integration',
-                    'mautic.badge.url.generator'
+                    'mautic.badge.url.generator',
+                    'mautic.badge.generator'
                 ],
             ],
             'mautic.badge.page.subscriber' => [

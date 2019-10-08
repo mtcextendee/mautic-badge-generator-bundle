@@ -69,4 +69,12 @@ class BadgeHashGenerator
        $key =  $contactId.'-'.$this->coreParametersHelper->getParameter('secret_key');
        return hash('sha1', $key);
     }
+
+    /**
+     * @return bool
+     */
+    public function isAdmin()
+    {
+        return $this->corePermissions->isAdmin();
+    }
 }

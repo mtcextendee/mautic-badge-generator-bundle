@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
+use MauticPlugin\MauticBadgeGeneratorBundle\Generator\BadgeGenerator;
 use MauticPlugin\MauticBadgeGeneratorBundle\Model\BadgeModel;
 use MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeUrlGenerator;
 
@@ -43,17 +44,24 @@ class ButtonSubscriber extends CommonSubscriber
     private $badgeUrlGenerator;
 
     /**
+     * @var BadgeGenerator
+     */
+    private $badgeGenerator;
+
+    /**
      * ButtonSubscriber constructor.
      *
      * @param BadgeModel        $badgeModel
      * @param IntegrationHelper $integrationHelper
      * @param BadgeUrlGenerator $badgeUrlGenerator
+     * @param BadgeGenerator    $badgeGenerator
      */
-    public function __construct(BadgeModel $badgeModel, IntegrationHelper $integrationHelper, BadgeUrlGenerator $badgeUrlGenerator)
+    public function __construct(BadgeModel $badgeModel, IntegrationHelper $integrationHelper, BadgeUrlGenerator $badgeUrlGenerator, BadgeGenerator $badgeGenerator)
     {
         $this->badgeModel = $badgeModel;
         $this->integrationHelper = $integrationHelper;
         $this->badgeUrlGenerator = $badgeUrlGenerator;
+        $this->badgeGenerator = $badgeGenerator;
     }
 
 
@@ -98,7 +106,9 @@ class ButtonSubscriber extends CommonSubscriber
         $badges = $this->badgeModel->getEntities();
         /** @var Badge $badge */
         foreach ($badges as $badge) {
-            if (!$this->displayBadgeInList($object, $badge)) {
+            try {
+                $this->badgeGenerator->displayBadge($object, $badge);
+            } catch (\Exception $exception) {
                 continue;
             }
             $this->addButtonGenerator(
@@ -113,28 +123,6 @@ class ButtonSubscriber extends CommonSubscriber
 
 
     }
-
-    /**
-     * @param Lead  $contact
-     * @param Badge $badge
-     *
-     * @return bool
-     */
-    private function displayBadgeInList(Lead $contact, Badge $badge)
-    {
-        if (empty($badge->getProperties()['tags'])) {
-            return true;
-        }
-
-        $contactTags = $contact->getTags()->getKeys();
-        foreach ($contactTags as $contactTag) {
-            if (in_array($contactTag, $badge->getProperties()['tags'])) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 
     /**
      * @param        $objectId

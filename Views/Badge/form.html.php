@@ -55,8 +55,14 @@ $item = $entity;
     <div class="col-md-3">
         <?php echo $view['form']->row($form['properties']['mapping']); ?>
     </div>
+</div>
+
+<div class="row">
     <div class="col-md-4">
         <?php echo $view['form']->row($form['properties']['tags']); ?>
+    </div>
+    <div class="col-md-5">
+        <?php echo $view['form']->row($form['properties']['restriction']); ?>
     </div>
 </div>
 <hr>

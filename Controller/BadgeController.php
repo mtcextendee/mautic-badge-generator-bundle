@@ -248,10 +248,12 @@ class BadgeController extends AbstractStandardFormController
         $hashGenerator = $this->get('mautic.badge.hash.generator');
         if (!$hashGenerator->isValidHash($contactId, $hash)) {
             return $this->accessDenied();
-
         }
-
-        return $badgeGenerator->generate($objectId, $contactId, $hash);
+        try {
+            return $badgeGenerator->generate($objectId, $contactId, $hash, $hashGenerator->isAdmin());
+        } catch (\Exception $exception) {
+            return $this->accessDenied();
+        }
     }
 
 }

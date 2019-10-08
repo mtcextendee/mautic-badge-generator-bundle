@@ -148,5 +148,18 @@ class BadgePropertiesType extends AbstractType
                 'data'       => ArrayHelper::getValue('mapping', $options['data']),
             ]
         );
+
+
+
+        $builder->add(
+            'restriction',
+            BadgeRestriction::class,
+            [
+                'label'      => false,
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'data'       => ArrayHelper::getValue('restriction', $options['data']),
+            ]
+        );
     }
 }
