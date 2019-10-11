@@ -471,7 +471,8 @@ class BadgeGenerator
      */
     private function displayBasedOnSegment(Lead $contact, Badge $badge)
     {
-        $segments = ArrayHelper::getValue('segment', $badge->getProperties()['restriction'], []);
+        $restriction = ArrayHelper::getValue('restriction', $badge->getProperties(), []);
+        $segments = ArrayHelper::getValue('segment', $restriction, []);
         if (empty($segments)) {
             return true;
         }
