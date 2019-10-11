@@ -233,7 +233,7 @@ class BadgeGenerator
             list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
             $pdf->SetTextColor($r, $g, $b);
             // create cell
-            $pdf->Cell($width, 50, $this->getCustomText('text'.$i), 0, 0, $align, false, '', $stretch);
+            $pdf->MultiCell($width-$positionX, '', $this->getCustomText('text'.$i), 0, 'L', false, 1, $positionX, $positionY, true, $stretch);
         }
 
 
