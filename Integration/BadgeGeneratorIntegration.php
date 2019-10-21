@@ -52,6 +52,13 @@ class BadgeGeneratorIntegration extends AbstractIntegration
         return 'none';
     }
 
+    public function getSupportedFeatures()
+    {
+        return [
+            'contacts_grid_to_print',
+        ];
+    }
+
     /**
      * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
      * @param array                                             $data
@@ -70,6 +77,7 @@ class BadgeGeneratorIntegration extends AbstractIntegration
                     'data'  => isset($data['disable_in_contact_list']) ? $data['disable_in_contact_list'] : false,
                 ]
             );
+
 
             $builder->add(
                 'numberOfTextBlocks',

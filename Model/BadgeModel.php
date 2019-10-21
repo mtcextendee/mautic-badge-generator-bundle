@@ -15,12 +15,8 @@ use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\MauticBadgeGeneratorBundle\BadgeEvents;
 use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
+use MauticPlugin\MauticBadgeGeneratorBundle\Entity\BadgeRepository;
 use MauticPlugin\MauticBadgeGeneratorBundle\Event\BadgeEvent;
-use MauticPlugin\MauticRecommenderBundle\Entity\Event;
-use MauticPlugin\MauticRecommenderBundle\Entity\EventRepository;
-use MauticPlugin\MauticRecommenderBundle\Entity\RecommenderTemplateRepository;
-use MauticPlugin\MauticRecommenderBundle\Event\RecommenderEvent;
-use MauticPlugin\MauticRecommenderBundle\RecommenderEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class BadgeModel extends FormModel implements AjaxLookupModelInterface
@@ -39,11 +35,11 @@ class BadgeModel extends FormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      *
-     * @return EventRepository
+     * @return BadgeRepository
      */
     public function getRepository()
     {
-        /** @var RecommenderTemplateRepository $repo */
+        /** @var BadgeRepository $repo */
         $repo = $this->em->getRepository('MauticBadgeGeneratorBundle:Badge');
 
         $repo->setTranslator($this->translator);

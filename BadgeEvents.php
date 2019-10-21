@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -32,7 +32,7 @@ final class BadgeEvents
      * The mautic.badge_post_save event is thrown right after a asset is persisted.
      *
      * The event listener receives a
-     * MauticPlugin\MauticBadgeGeneratorBundle\Event\RecommenderEvent instance.
+     * MauticPlugin\MauticBadgeGeneratorBundle\Event\BadgeEvent instance.
      *
      * @var string
      */
@@ -42,7 +42,7 @@ final class BadgeEvents
      * The mautic.badge_pre_delete event is thrown prior to when a asset is deleted.
      *
      * The event listener receives a
-     * MauticPlugin\MauticBadgeGeneratorBundle\Event\RecommenderEvent instance.
+     * MauticPlugin\MauticBadgeGeneratorBundle\Event\BadgeEvent instance.
      *
      * @var string
      */
@@ -52,7 +52,7 @@ final class BadgeEvents
      * The mautic.badge_post_delete event is thrown after a asset is deleted.
      *
      * The event listener receives a
-     * MauticPlugin\MauticBadgeGeneratorBundle\Event\RecommenderEvent instance.
+     * MauticPlugin\MauticBadgeGeneratorBundle\Event\BadgeEvent instance.
      *
      * @var string
      */

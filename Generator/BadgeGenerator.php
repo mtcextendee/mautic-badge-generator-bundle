@@ -210,6 +210,7 @@ class BadgeGenerator
             $align     = ArrayHelper::getValue('align', $badge->getProperties()['text'.$i], 'C');
             $color     = ArrayHelper::getValue('color', $badge->getProperties()['text'.$i], '000000');
             $fontSize  = ArrayHelper::getValue('fontSize', $badge->getProperties()['text'.$i], 30);
+            $lineHeight  = ArrayHelper::getValue('lineHeight', $badge->getProperties()['text'.$i], 1);
             $stretch   = ArrayHelper::getValue('stretch', $badge->getProperties()['text'.$i], 0);
             $style     = ArrayHelper::getValue('style', $badge->getProperties()['text'.$i], []);
             $font      = ArrayHelper::getValue('font', $badge->getProperties()['text'.$i], $this->fontName);
@@ -233,6 +234,7 @@ class BadgeGenerator
             list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
             $pdf->SetTextColor($r, $g, $b);
             // create cell
+            $pdf->setCellHeightRatio($lineHeight);
             $pdf->MultiCell($width-$positionX, '', $this->getCustomText('text'.$i), 0, 'L', false, 1, $positionX, $positionY, true, $stretch);
         }
 
@@ -495,7 +497,7 @@ class BadgeGenerator
      */
     private function displaBasedOnTags(Lead $contact, Badge $badge)
     {
-        $tags = ArrayHelper::getValue('tags', $badge->getProperties()['tags']);
+        $tags = ArrayHelper::getValue('tags', $badge->getProperties());
         if (empty($tags)) {
             return true;
         }

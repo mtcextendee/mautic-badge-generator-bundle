@@ -303,6 +303,20 @@ class BadgeTextType extends AbstractType
         );
 
         $builder->add(
+            'lineHeight',
+            NumberType::class,
+            [
+                'label'      => 'mautic.plugin.badge.generator.form.line.height',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+                'data'  => isset($options['data']['lineHeight']) ? $options['data']['lineHeight'] : 1,
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
             'style',
             'choice',
             [

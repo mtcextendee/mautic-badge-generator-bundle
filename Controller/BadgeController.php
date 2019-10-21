@@ -13,14 +13,19 @@ namespace MauticPlugin\MauticBadgeGeneratorBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Helper\ArrayHelper;
+use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
 use MauticPlugin\MauticBadgeGeneratorBundle\Generator\BadgeGenerator;
 use MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeHashGenerator;
 use MauticPlugin\MauticBadgeGeneratorBundle\Uploader\BadgeUploader;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class BadgeController extends AbstractStandardFormController
 {
+    use EntityContactsTrait;
+
     /**
      * @var string
      */
@@ -181,7 +186,7 @@ class BadgeController extends AbstractStandardFormController
                 'viewParameters'  => ['page' => $page],
                 'contentTemplate' => 'MauticBadgeGeneratorBundle:Badge:index',
                 'passthroughVars' => [
-                    'activeLink'    => '#mautic_badge_generator_index',
+                    'activeLink'    => '#mautic_badge_generator_contacts',
                     'mauticContent' => 'badge',
                 ],
             ]
@@ -254,6 +259,64 @@ class BadgeController extends AbstractStandardFormController
         } catch (\Exception $exception) {
             return $this->accessDenied();
         }
+    }
+
+    /**
+     * @return JsonResponse|Response
+     */
+    public function listViewAction()
+    {
+        $sessionVar = 'badge';
+        $this->get('session')->set('mautic.'.$sessionVar.'.contact.orderby', 'l.firstname');
+        $this->get('session')->set('mautic.'.$sessionVar.'.contact.orderbydir', 'ASC');
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'permissions' => [],
+                'contacts'    => $this->forward(
+                    'MauticBadgeGeneratorBundle:Badge:contacts',
+                    [
+                        'objectId'=> 1,
+                        'page'       => $this->get('session')->get('mautic.badge.contact.page', 1),
+                        'ignoreAjax' => true,
+                    ]
+                )->getContent(),
+            ],
+            'contentTemplate' => 'MauticBadgeGeneratorBundle:Badge:contact_list.html.php',
+            'passthroughVars' => [
+                'mauticContent' => 'badge',
+            ],
+        ]);
+    }
+
+    /**
+     * @param     $objectId
+     * @param int $page
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function contactsAction($objectId, $page = 1)
+    {
+        $sessionVar = 'badge';
+
+        $filters =
+            [
+                'date_identified' => [
+                    'col'   => 'date_identified',
+                    'expr'   => 'isNotNull',
+                    'value'  => '',
+                ]
+        ];
+        return $this->generateContactsGrid(
+            1,
+            $page,
+            '',
+            $sessionVar,
+            '',
+            '',
+            '',
+            $filters
+        );
     }
 
 }

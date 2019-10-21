@@ -9,7 +9,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-/** @var \MauticPlugin\MauticRecommenderBundle\Entity\RecommenderTemplate $entity */
+/** @var \MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge $entity */
+
 $isEmbedded = false;
 if (!$isEmbedded) {
     $view->extend('MauticCoreBundle:Default:content.html.php');
@@ -28,23 +29,23 @@ if (!$isEmbedded) {
                 'customButtons' => (isset($customButtons)) ? $customButtons : [],
                 'templateButtons' => [
                     'edit' => $view['security']->hasEntityAccess(
-                        $permissions['recommender:recommender:editown'],
-                        $permissions['recommender:recommender:editother'],
+                        $permissions['lead:leads:editown'],
+                        $permissions['lead:leads:editother'],
                         $entity->getCreatedBy()
                     ),
-                    'clone' => $permissions['recommender:recommender:create'],
+                    'clone' => $permissions['lead:leads:create'],
                     'delete' => $view['security']->hasEntityAccess(
-                        $permissions['recommender:recommender:deleteown'],
-                        $permissions['recommender:recommender:deleteother'],
+                        $permissions['lead:leads:deleteown'],
+                        $permissions['lead:leads:deleteother'],
                         $entity->getCreatedBy()
                     ),
                     'close' => $view['security']->hasEntityAccess(
-                        $permissions['recommender:recommender:viewown'],
-                        $permissions['recommender:recommender:viewother'],
+                        $permissions['lead:leads:viewown'],
+                        $permissions['lead:leads:viewother'],
                         $entity->getCreatedBy()
                     ),
                 ],
-                'routeBase' => 'recommender_event',
+                'routeBase' => 'badge',
             ]
         )
     );

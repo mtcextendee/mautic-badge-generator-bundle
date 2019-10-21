@@ -13,7 +13,7 @@ $view->extend('MauticCoreBundle:FormTheme:form_simple.html.php');
 ?>
 <?php
 $view['slots']->start('primaryFormContent');
-/** @var \MauticPlugin\MauticRecommenderBundle\Entity\RecommenderTemplate $recommender */
+/** @var \MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge $item */
 $item = $entity;
 ?>
 <style>

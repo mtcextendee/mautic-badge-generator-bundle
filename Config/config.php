@@ -34,6 +34,16 @@ return [
                 'arguments' => [
                     'mautic.badge.model.badge'
                 ],
+            ],
+            'mautic.badge.inject.custom.content.subscriber' => [
+                'class'     => \MauticPlugin\MauticBadgeGeneratorBundle\EventListener\InjectCustomContentSubscriber::class,
+                'arguments' => [
+                    'mautic.helper.templating',
+                    'mautic.badge.model.badge',
+                    'mautic.helper.integration',
+                    'mautic.badge.url.generator',
+                    'mautic.badge.generator'
+                ],
             ]
         ],
         'models' => [
@@ -133,6 +143,14 @@ return [
                 'path'       => '/badge/generator/{objectAction}/{objectId}',
                 'controller' => 'MauticBadgeGeneratorBundle:Badge:execute',
             ],
+            'mautic_badge_generator_list' => [
+                'path'       => '/badge/contacts',
+                'controller' => 'MauticBadgeGeneratorBundle:Badge:listView',
+            ],
+            'mautic_badge_generator_contacts' => [
+                'path'       => '/badge/generator/contacts/{objectId}/page/{page}',
+                'controller' => 'MauticBadgeGeneratorBundle:Badge:contacts',
+            ],
         ],
         'public' => [
             'mautic_badge_generator_event' => [
@@ -147,8 +165,6 @@ return [
                     'hash' => '',
                 ],
             ],
-
-
         ],
     ],
     'menu'        => [
@@ -162,6 +178,35 @@ return [
                         'integration' => [
                             'BadgeGenerator' => [
                                 'enabled' => true,
+                            ],
+                        ],
+                    ],
+                ],
+                'mautic.plugin.badge.generator.index' => [
+                    'route'    => 'mautic_badge_generator_index',
+                    'iconClass' => 'fa fa-id-badge',
+                    'priority' => 70,
+                    'parent'   => 'mautic.plugin.badge.generator',
+                    'checks'   => [
+                        'integration' => [
+                            'BadgeGenerator' => [
+                                'enabled' => true,
+                            ],
+                        ],
+                    ],
+                ],
+                'mautic.plugin.badge.generator.contacts' => [
+                    'route'    => 'mautic_badge_generator_list',
+                    'iconClass' => 'fa fa-user',
+                    'priority' => 70,
+                    'parent'   => 'mautic.plugin.badge.generator',
+                    'checks'   => [
+                        'integration' => [
+                            'BadgeGenerator' => [
+                                'enabled' => true,
+                                'features' => [
+                                    'contacts_grid_to_print',
+                                ],
                             ],
                         ],
                     ],

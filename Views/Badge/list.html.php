@@ -11,7 +11,7 @@
 if ($tmpl == 'index') {
     $view->extend('MauticBadgeGeneratorBundle:Badge:index.html.php');
 }
-/* @var \MauticPlugin\MauticRecommenderBundle\Entity\RecommenderTemplate[] $items */
+/* @var \MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge $items */
 ?>
 <?php if (count($items)): ?>
     <div class="table-responsive page-list">
