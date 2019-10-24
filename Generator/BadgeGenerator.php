@@ -235,7 +235,7 @@ class BadgeGenerator
             $pdf->SetTextColor($r, $g, $b);
             // create cell
             $pdf->setCellHeightRatio($lineHeight);
-            $pdf->MultiCell($width-$positionX, '', $this->getCustomText('text'.$i), 0, 'L', false, 1, $positionX, $positionY, true, $stretch);
+            $pdf->MultiCell($width-$positionX, '', $this->getCustomText('text'.$i), 0, $align, false, 1, $positionX, $positionY, true, $stretch);
         }
 
 
