@@ -234,6 +234,7 @@ class BadgeTextType extends AbstractType
                 'choices'     => [
                     'C' => 'mautic.core.center',
                     'L' => 'mautic.core.left',
+                    'R' => 'mautic.core.right',
                 ],
                 'label'       => 'mautic.plugin.badge.generator.form.text.align',
                 'label_attr'  => ['class' => 'control-label'],
@@ -243,6 +244,17 @@ class BadgeTextType extends AbstractType
                 'required'    => false,
                 'data'  => isset($options['data']['align']) ? $options['data']['align'] : 'L',
                 'empty_value' => false,
+            ]
+        );
+
+        $builder->add(
+            'rtl',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.plugin.badge.generator.form.text.rtl',
+                'attr'  => [
+                ],
+                'data'  => isset($options['data']['rtl']) ? $options['data']['rtl'] : false,
             ]
         );
 

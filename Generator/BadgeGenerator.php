@@ -208,6 +208,8 @@ class BadgeGenerator
             $positionY = ArrayHelper::getValue('position', $badge->getProperties()['text'.$i], $i * 20);
             $positionX = ArrayHelper::getValue('positionX', $badge->getProperties()['text'.$i], 0);
             $align     = ArrayHelper::getValue('align', $badge->getProperties()['text'.$i], 'C');
+            $rtl     = ArrayHelper::getValue('rtl', $badge->getProperties()['text'.$i], false);
+
             $color     = ArrayHelper::getValue('color', $badge->getProperties()['text'.$i], '000000');
             $fontSize  = ArrayHelper::getValue('fontSize', $badge->getProperties()['text'.$i], 30);
             $lineHeight  = ArrayHelper::getValue('lineHeight', $badge->getProperties()['text'.$i], 1);
@@ -235,6 +237,7 @@ class BadgeGenerator
             $pdf->SetTextColor($r, $g, $b);
             // create cell
             $pdf->setCellHeightRatio($lineHeight);
+            $pdf->setRTL((bool) $rtl);
             $pdf->MultiCell($width-$positionX, '', $this->getCustomText('text'.$i), 0, $align, false, 1, $positionX, $positionY, true, $stretch);
         }
 
@@ -293,6 +296,12 @@ class BadgeGenerator
                     default:
                         $type = 'JPG';
                 }
+//Start Graphic Transformation
+               // $pdf->StartTransform();
+
+// set clipping mask
+              //  $pdf->Circle($positionX+($width/2), ($height/2)+$positionY, ($width/2)-20, 0,360,  'CNZ', [], [255,255,2]);
+
                 $pdf->Image(
                     $image,
                     $positionX,
@@ -302,7 +311,7 @@ class BadgeGenerator
                     $type,
                     '',
                     'C',
-                    false,
+                    true,
                     150,
                     $align,
                     false,
@@ -313,6 +322,9 @@ class BadgeGenerator
                     true
                 );
             }
+
+            //$pdf->StopTransform();
+
         }
 
 
