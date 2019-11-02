@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Token;
 
+use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -28,15 +29,22 @@ class BadgeUrlGenerator
     private $badgeHashGenerator;
 
     /**
+     * @var EncryptionHelper
+     */
+    private $encryptionHelper;
+
+    /**
      * BarcodeTokenReplacer constructor.
      *
      * @param RouterInterface    $router
      * @param BadgeHashGenerator $badgeHashGenerator
+     * @param EncryptionHelper   $encryptionHelper
      */
-    public function __construct(RouterInterface $router, BadgeHashGenerator $badgeHashGenerator)
+    public function __construct(RouterInterface $router, BadgeHashGenerator $badgeHashGenerator, EncryptionHelper $encryptionHelper)
     {
         $this->router = $router;
         $this->badgeHashGenerator = $badgeHashGenerator;
+        $this->encryptionHelper = $encryptionHelper;
     }
 
     /**
@@ -54,6 +62,22 @@ class BadgeUrlGenerator
                 'contactId' => $contactId,
                 'hash' => $this->badgeHashGenerator->getHashId($contactId),
 
+            ],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+    }
+
+    /**
+     * @param string $imageBlock
+     *
+     * @return string
+     */
+    public function getLinkToRoundedImage($imageUrl)
+    {
+        return $this->router->generate(
+            'mautic_badge_generator_image_rounded',
+            [
+                'encryptImageUrl' => $this->encryptionHelper->encrypt($imageUrl),
             ],
             UrlGeneratorInterface::ABSOLUTE_URL
         );

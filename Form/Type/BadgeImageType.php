@@ -53,6 +53,17 @@ class BadgeImageType extends AbstractType
         );
 
         $builder->add(
+            'rounded',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.plugin.badge.generator.form.rounded',
+                'attr'  => [
+                ],
+                'data'  => isset($options['data']['rounded']) ? $options['data']['rounded'] : false,
+            ]
+        );
+
+        $builder->add(
             'align',
             'choice',
             [

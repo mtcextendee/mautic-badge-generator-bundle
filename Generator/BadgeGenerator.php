@@ -23,6 +23,7 @@ use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
 use MauticPlugin\MauticBadgeGeneratorBundle\Generator\Crate\ContactFieldCrate;
 use MauticPlugin\MauticBadgeGeneratorBundle\Generator\Crate\PropertiesCrate;
 use MauticPlugin\MauticBadgeGeneratorBundle\Model\BadgeModel;
+use MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeUrlGenerator;
 use MauticPlugin\MauticBadgeGeneratorBundle\Uploader\BadgeUploader;
 use setasign\Fpdi\Tcpdf\Fpdi;
 
@@ -93,6 +94,11 @@ class BadgeGenerator
     private $pathsHelper;
 
     /**
+     * @var BadgeUrlGenerator
+     */
+    private $badgeUrlGenerator;
+
+    /**
      * BadgeGenerator constructor.
      *
      * @param BadgeModel           $badgeModel
@@ -104,6 +110,7 @@ class BadgeGenerator
      * @param QRcodeGenerator      $QRcodeGenerator
      * @param AssetsHelper         $assetsHelper
      * @param PathsHelper          $pathsHelper
+     * @param BadgeUrlGenerator    $badgeUrlGenerator
      */
     public function __construct(
         BadgeModel $badgeModel,
@@ -114,7 +121,8 @@ class BadgeGenerator
         BarcodeGenerator $barcodeGenerator,
         QRcodeGenerator $QRcodeGenerator,
         AssetsHelper $assetsHelper,
-        PathsHelper $pathsHelper
+        PathsHelper $pathsHelper,
+        BadgeUrlGenerator $badgeUrlGenerator
     ) {
         $this->badgeModel           = $badgeModel;
         $this->leadModel            = $leadModel;
@@ -125,6 +133,7 @@ class BadgeGenerator
         $this->QRcodeGenerator      = $QRcodeGenerator;
         $this->assetsHelper         = $assetsHelper;
         $this->pathsHelper          = $pathsHelper;
+        $this->badgeUrlGenerator = $badgeUrlGenerator;
     }
 
     /**
@@ -263,6 +272,7 @@ class BadgeGenerator
             $width     = ArrayHelper::getValue('width', $badge->getProperties()['image'.$i], 100);
             $height    = ArrayHelper::getValue('height', $badge->getProperties()['image'.$i], 100);
             $align     = ArrayHelper::getValue('align', $badge->getProperties()['image'.$i], 'C');
+            $rounded     = ArrayHelper::getValue('rounded', $badge->getProperties()['image'.$i], false);
             if ($align !== 'C') {
                 $align = '';
             }
@@ -277,9 +287,12 @@ class BadgeGenerator
                     $image = $this->getCustomImage('image'.$i);
                 }
             } else {
-                $image = $this->getCustomImage('image'.$i, 'https://placehold.co/300x200.jpg');
+                $image = $this->getCustomImage('image'.$i, 'https://placehold.co/300x300.png');
             }
 
+            if ($rounded) {
+               // $image = $this->badgeUrlGenerator->getLinkToRoundedImage($image);
+            }
             if (filter_var($image, FILTER_VALIDATE_URL)) {
                 switch (exif_imagetype($image)) {
                     case IMG_GIF:
@@ -297,11 +310,10 @@ class BadgeGenerator
                         $type = 'JPG';
                 }
 //Start Graphic Transformation
-               // $pdf->StartTransform();
+                // $pdf->StartTransform();
 
 // set clipping mask
-              //  $pdf->Circle($positionX+($width/2), ($height/2)+$positionY, ($width/2)-20, 0,360,  'CNZ', [], [255,255,2]);
-
+                //  $pdf->Circle($positionX+($width/2), ($height/2)+$positionY, ($width/2)-20, 0,360,  'CNZ', [], [255,255,2]);
                 $pdf->Image(
                     $image,
                     $positionX,
@@ -311,7 +323,7 @@ class BadgeGenerator
                     $type,
                     '',
                     'C',
-                    true,
+                    false,
                     150,
                     $align,
                     false,
