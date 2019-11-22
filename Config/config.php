@@ -109,6 +109,14 @@ return [
                     'mautic.security'
                 ],
             ],
+
+            'mautic.badge.rounded.image.generator' => [
+                'class'     => \MauticPlugin\MauticBadgeGeneratorBundle\Generator\RoundedImageGenerator::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.paths'
+                ],
+            ],
         ],
         'forms'=>[
             'mautic.form.type.badge' => [
@@ -162,7 +170,7 @@ return [
                 ],
             ],
             'mautic_badge_generator_image_rounded' => [
-                'path'       => '/badge/image/rounded/{encryptImageUrl}',
+                'path'       => '/badge/image/rounded/{encryptImageUrl}/{width}',
                 'controller' => 'MauticBadgeGeneratorBundle:Badge:image',
             ],
         ],
@@ -218,5 +226,6 @@ return [
         'badge_image_directory'         => 'badges',
         'badge_custom_font_path_to_ttf' => false,
         'badge_text_block_count' => 4,
+        'rounded_image_directory'=>'badge'
     ],
 ];

@@ -63,23 +63,6 @@ class BadgeImageType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'align',
-            'choice',
-            [
-                'choices' => [
-                    'C'=>'mautic.core.center',
-                    '' => 'mautic.core.left',
-                ],
-                'label'      => 'mautic.plugin.badge.generator.form.text.align',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                ],
-                'required'    => false,
-                'empty_value' => false,
-            ]
-        );
 
         $builder->add(
             'width',
@@ -102,6 +85,7 @@ class BadgeImageType extends AbstractType
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => [
                     'class'   => 'form-control',
+                    'data-show-on' => '{"badge_properties_image'.$options['data']['index'].'_rounded_0":"checked"}',
                 ],
                 'required'    => false,
             ]
@@ -130,6 +114,24 @@ class BadgeImageType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'align',
+            'choice',
+            [
+                'choices' => [
+                    'C'=>'mautic.core.center',
+                    '' => 'mautic.core.left',
+                ],
+                'label'      => 'mautic.plugin.badge.generator.form.text.align',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                ],
+                'required'    => false,
+                'empty_value' => false,
             ]
         );
 

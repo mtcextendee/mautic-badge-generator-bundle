@@ -72,12 +72,13 @@ class BadgeUrlGenerator
      *
      * @return string
      */
-    public function getLinkToRoundedImage($imageUrl)
+    public function getLinkToRoundedImage($imageUrl, $width)
     {
         return $this->router->generate(
             'mautic_badge_generator_image_rounded',
             [
-                'encryptImageUrl' => $this->encryptionHelper->encrypt($imageUrl),
+                'encryptImageUrl' => serialize($this->encryptionHelper->encrypt($imageUrl)),
+                'width' => $width,
             ],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
