@@ -262,8 +262,9 @@ class BadgeGenerator
                 continue;
             }
 
+            $avatar = ArrayHelper::getValue('avatar', $badge->getProperties()['image'.$i], false);
             $field = ArrayHelper::getValue('fields', $badge->getProperties()['image'.$i], false);
-            if (empty($field)) {
+            if (empty($field) && empty($avatar)) {
                 continue;
             }
 
@@ -281,7 +282,7 @@ class BadgeGenerator
             //  $pdf->SetXY($positionX, $positionY);
             $image = '';
             if ($hash) {
-                if (!empty($this->badge->getProperties()['image'.$i]['avatar'])) {
+                if (!empty($avatar)) {
                     $image = $this->getAvatar();
                 } else {
                     $image = $this->getCustomImage('image'.$i);
