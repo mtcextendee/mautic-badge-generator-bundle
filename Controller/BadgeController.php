@@ -264,6 +264,20 @@ class BadgeController extends AbstractStandardFormController
         }
     }
 
+
+    /**
+     * @param      $objectId
+     * @param null $contactId
+     */
+    public function batchGenerateAction($objectId, $contactId = null, $hash = null)
+    {
+        $ids      = $this->request->get('ids');
+        /** @var BadgeGenerator $badgeGenerator */
+        $badgeGenerator = $this->get('mautic.badge.generator');
+
+        return $badgeGenerator->generateBatch(explode(',', $ids));
+    }
+
     /**
      * @return JsonResponse|Response
      */

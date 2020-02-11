@@ -133,8 +133,65 @@ class BadgeGenerator
         $this->QRcodeGenerator      = $QRcodeGenerator;
         $this->assetsHelper         = $assetsHelper;
         $this->pathsHelper          = $pathsHelper;
-        $this->badgeUrlGenerator = $badgeUrlGenerator;
+        $this->badgeUrlGenerator    = $badgeUrlGenerator;
     }
+
+    /**
+     * @param Lead $contact
+     *
+     * @return array
+     */
+    private function getContactBadges(Lead $contact)
+    {
+        $badges        = $this->badgeModel->getEntities();
+        $contactBadges = [];
+        /** @var Badge $badge */
+        foreach ($badges as $badge) {
+            try {
+                $this->displayBadge($contact, $badge);
+                $contactBadges[] = $badge;
+            } catch (\Exception $exception) {
+                continue;
+            }
+        }
+
+        return $contactBadges;
+    }
+
+
+    public function generateBatch(array $contactIds)
+    {
+        $contacts = $this->leadModel->getEntities(
+            [
+                'filter'           => [
+                    'force' => [
+                        [
+                            'column' => 'l.id',
+                            'expr'   => 'in',
+                            'value'  => $contactIds,
+                        ],
+                    ],
+                ],
+                'ignore_paginator' => true,
+            ]
+        );
+
+        $pdf = $this->loadFpdi();
+        $i   = 0;
+        foreach ($contacts as $contact) {
+            $contactBadges = $this->getContactBadges($contact);
+            if (empty($contactBadges)) {
+                continue;
+            }
+            $contactBadge = reset($contactBadges);
+
+            $pdf = $this->generateBadgeToPDF($contactBadge->getId(), $contact->getId(), null, null, $pdf);
+        }
+        $filename = 'custom_pdf_'.time().'.pdf';
+        $pdf->Output($filename, 'I');
+
+    }
+
 
     /**
      * @param      $badgeId
@@ -152,6 +209,28 @@ class BadgeGenerator
      */
     public function generate($badgeId, $leadId, $hash = null, $isAdmin = false)
     {
+        $pdf = $this->loadFpdi();
+
+        $pdf = $this->generateBadgeToPDF($badgeId, $leadId, $hash, $isAdmin, $pdf);
+        echo $pdf->Output('custom_pdf_'.time().'.pdf', 'I');
+        exit;
+    }
+
+    /**
+     * @param      $badgeId
+     * @param      $leadId
+     * @param null $hash
+     * @param bool $isAdmin
+     *
+     * @throws EntityNotFoundException
+     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
+     * @throws \setasign\Fpdi\PdfParser\Filter\FilterException
+     * @throws \setasign\Fpdi\PdfParser\PdfParserException
+     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
+     * @throws \setasign\Fpdi\PdfReader\PdfReaderException
+     */
+    private function generateBadgeToPDF($badgeId, $leadId, $hash = null, $isAdmin = false, Fpdi &$pdf)
+    {
         if (!$badge = $this->badgeModel->getEntity($badgeId)) {
             throw new EntityNotFoundException(sprintf('Badge with ID "%s" not exist', $badgeId));
         }
@@ -162,7 +241,10 @@ class BadgeGenerator
             $this->displayBadge($this->contact, $badge);
         }
 
-        $pdf = $this->loadFpdi();
+        $pdf->AddPage();
+        $pdf->SetAutoPageBreak(true, 0);
+        $pdf->SetMargins(0, 0, 0);
+
         $pdf->setSourceFile($this->badgeUploader->getCompleteFilePath($badge, $badge->getSource()));
         // import page 1
         $tplIdx = $pdf->importPage(1);
@@ -217,14 +299,14 @@ class BadgeGenerator
             $positionY = ArrayHelper::getValue('position', $badge->getProperties()['text'.$i], $i * 20);
             $positionX = ArrayHelper::getValue('positionX', $badge->getProperties()['text'.$i], 0);
             $align     = ArrayHelper::getValue('align', $badge->getProperties()['text'.$i], 'C');
-            $rtl     = ArrayHelper::getValue('rtl', $badge->getProperties()['text'.$i], false);
+            $rtl       = ArrayHelper::getValue('rtl', $badge->getProperties()['text'.$i], false);
 
-            $color     = ArrayHelper::getValue('color', $badge->getProperties()['text'.$i], '000000');
-            $fontSize  = ArrayHelper::getValue('fontSize', $badge->getProperties()['text'.$i], 30);
-            $lineHeight  = ArrayHelper::getValue('lineHeight', $badge->getProperties()['text'.$i], 1);
-            $stretch   = ArrayHelper::getValue('stretch', $badge->getProperties()['text'.$i], 0);
-            $style     = ArrayHelper::getValue('style', $badge->getProperties()['text'.$i], []);
-            $font      = ArrayHelper::getValue('font', $badge->getProperties()['text'.$i], $this->fontName);
+            $color      = ArrayHelper::getValue('color', $badge->getProperties()['text'.$i], '000000');
+            $fontSize   = ArrayHelper::getValue('fontSize', $badge->getProperties()['text'.$i], 30);
+            $lineHeight = ArrayHelper::getValue('lineHeight', $badge->getProperties()['text'.$i], 1);
+            $stretch    = ArrayHelper::getValue('stretch', $badge->getProperties()['text'.$i], 0);
+            $style      = ArrayHelper::getValue('style', $badge->getProperties()['text'.$i], []);
+            $font       = ArrayHelper::getValue('font', $badge->getProperties()['text'.$i], $this->fontName);
             if ($font == 'custom') {
                 $ttf = ArrayHelper::getValue('ttf', $badge->getProperties()['text'.$i]);
                 if ($ttf) {
@@ -247,7 +329,19 @@ class BadgeGenerator
             // create cell
             $pdf->setCellHeightRatio($lineHeight);
             $pdf->setRTL((bool) $rtl);
-            $pdf->MultiCell($width-$positionX, '', $this->getCustomText('text'.$i), 0, $align, false, 1, $positionX, $positionY, true, $stretch);
+            $pdf->MultiCell(
+                $width - $positionX,
+                '',
+                $this->getCustomText('text'.$i),
+                0,
+                $align,
+                false,
+                1,
+                $positionX,
+                $positionY,
+                true,
+                $stretch
+            );
         }
 
 
@@ -263,7 +357,7 @@ class BadgeGenerator
             }
 
             $avatar = ArrayHelper::getValue('avatar', $badge->getProperties()['image'.$i], false);
-            $field = ArrayHelper::getValue('fields', $badge->getProperties()['image'.$i], false);
+            $field  = ArrayHelper::getValue('fields', $badge->getProperties()['image'.$i], false);
             if (empty($field) && empty($avatar)) {
                 continue;
             }
@@ -273,7 +367,7 @@ class BadgeGenerator
             $width     = ArrayHelper::getValue('width', $badge->getProperties()['image'.$i], 100);
             $height    = ArrayHelper::getValue('height', $badge->getProperties()['image'.$i], 100);
             $align     = ArrayHelper::getValue('align', $badge->getProperties()['image'.$i], 'C');
-            $rounded     = ArrayHelper::getValue('rounded', $badge->getProperties()['image'.$i], false);
+            $rounded   = ArrayHelper::getValue('rounded', $badge->getProperties()['image'.$i], false);
             if ($align !== 'C') {
                 $align = '';
             }
@@ -361,8 +455,7 @@ class BadgeGenerator
             }
         }
 
-        echo $pdf->Output('custom_pdf_'.time().'.pdf', 'I');
-        exit;
+        return $pdf;
     }
 
     /**
@@ -380,11 +473,6 @@ class BadgeGenerator
             $pdf->SetFont($this->fontName, '', '30');
         }
 
-        $pdf->AddPage();
-        $pdf->SetAutoPageBreak(TRUE, 0);
-        $pdf->SetMargins(0, 0, 0);
-
-
         return $pdf;
     }
 
@@ -396,14 +484,15 @@ class BadgeGenerator
      */
     private function getCustomImage($block, $default = null)
     {
-        $image = $this->getCustomTextFromFields($block, $default);
+        $image  = $this->getCustomTextFromFields($block, $default);
         $fields = $this->getFields($block);
-        $field = reset($fields);
+        $field  = reset($fields);
         if ($this->contact && $field == 'country' && $image) {
             if ($flagImage = $this->assetsHelper->getCountryFlag($image, true)) {
-                $image =  $this->coreParametersHelper->getParameter('site_url').$flagImage;
+                $image = $this->coreParametersHelper->getParameter('site_url').$flagImage;
             }
         }
+
         return $image;
     }
 
@@ -429,7 +518,8 @@ class BadgeGenerator
     private function getContactFieldValue($alias, $default = null)
     {
         $fieldValue = $this->contact->getFieldValue($alias);
-        return $this->contact ?  $fieldValue : ($default ? $default : $alias);
+
+        return $this->contact ? $fieldValue : ($default ? $default : $alias);
     }
 
     /**
@@ -440,7 +530,7 @@ class BadgeGenerator
     private function getCustomTextFromFields($block, $default = null)
     {
         $fields = $this->getFields($block);
-        $text = [];
+        $text   = [];
         foreach ($fields as $field) {
             $text[] = $this->getContactFieldValue($field, $default);
         }
@@ -523,7 +613,7 @@ class BadgeGenerator
     private function displayBasedOnSegment(Lead $contact, Badge $badge)
     {
         $restriction = ArrayHelper::getValue('restriction', $badge->getProperties(), []);
-        $segments = ArrayHelper::getValue('segment', $restriction, []);
+        $segments    = ArrayHelper::getValue('segment', $restriction, []);
         if (empty($segments)) {
             return true;
         }
@@ -562,7 +652,11 @@ class BadgeGenerator
     }
 
     public function
-    Crop_ByRadius($source_url,$Radius="0px" ,$Keep_SourceFile = TRUE){
+    Crop_ByRadius(
+        $source_url,
+        $Radius = "0px",
+        $Keep_SourceFile = true
+    ) {
 
         /*
             Output File is png, Because for crop we need transparent color
@@ -576,37 +670,39 @@ class BadgeGenerator
                                 50%     => 50%
         */
 
-        if( $Radius == NULL )
-            return FALSE;
-
-
+        if ($Radius == null) {
+            return false;
+        }
 
 
         $ImageInfo = getimagesize($source_url);
-        $w = $ImageInfo[0];
-        $h = $ImageInfo[1];
-        $mime = $ImageInfo['mime'];
+        $w         = $ImageInfo[0];
+        $h         = $ImageInfo[1];
+        $mime      = $ImageInfo['mime'];
 
-        if( $mime != "image/jpeg" && $mime != "image/jpg" && $mime != "image/png")
-            return FALSE;
+        if ($mime != "image/jpeg" && $mime != "image/jpg" && $mime != "image/png") {
+            return false;
+        }
 
-        if( strpos($Radius,"%") !== FALSE ){
+        if (strpos($Radius, "%") !== false) {
             //$Radius by Cent
-            $Radius = intval( str_replace("%","",$Radius) );
+            $Radius        = intval(str_replace("%", "", $Radius));
             $Smallest_Side = $w <= $h ? $w : $h;
-            $Radius = $Smallest_Side * $Radius / 100;
+            $Radius        = $Smallest_Side * $Radius / 100;
 
-        }else{
+        } else {
             $Radius = strtolower($Radius);
-            $Radius = str_replace("px","",$Radius);
+            $Radius = str_replace("px", "", $Radius);
         }
 
         $Radius = is_numeric($Radius) ? intval($Radius) : 0;
 
-        if( $Radius == 0 ) return FALSE;
-        $src = imagecreatefromstring(file_get_contents($source_url));
-        $newpic = imagecreatetruecolor($w,$h);
-        imagealphablending($newpic,false);
+        if ($Radius == 0) {
+            return false;
+        }
+        $src    = imagecreatefromstring(file_get_contents($source_url));
+        $newpic = imagecreatetruecolor($w, $h);
+        imagealphablending($newpic, false);
         $transparent = imagecolorallocatealpha($newpic, 0, 0, 0, 127);
         //$transparent = imagecolorallocatealpha($newpic, 255, 0, 0, 0);//RED For Test
 
@@ -618,61 +714,68 @@ class BadgeGenerator
 
         //We select the pixels we are sure are in range, to Take up the bigger steps and shorten the processing time
 
-        $Sure_x_Start = $Radius +1;
-        $Sure_x_End = $w - $Radius -1;
-        $Sure_y_Start = $Radius +1;
-        $Sure_y_End = $h - $Radius -1;
-        if( $w <= $h ){
+        $Sure_x_Start = $Radius + 1;
+        $Sure_x_End   = $w - $Radius - 1;
+        $Sure_y_Start = $Radius + 1;
+        $Sure_y_End   = $h - $Radius - 1;
+        if ($w <= $h) {
             //We want to use the larger side to make processing shorter
-            $Use_x_Sure = FALSE;
-            $Use_y_Sure = TRUE;
-        }else{
-            $Use_x_Sure = TRUE;
-            $Use_y_Sure = FALSE;
+            $Use_x_Sure = false;
+            $Use_y_Sure = true;
+        } else {
+            $Use_x_Sure = true;
+            $Use_y_Sure = false;
         }
         /********************** Pixel step config END********************************/
 
         $Pixel_Step = $Pixel_Step_def;
-        for( $x=0; $x < $w ; $x+=$Pixel_Step ){
+        for ($x = 0; $x < $w; $x += $Pixel_Step) {
 
-            if( $Use_x_Sure && $x > $Sure_x_Start && $x < $Sure_x_End ) $Pixel_Step = 1;else $Pixel_Step = $Pixel_Step_def;
+            if ($Use_x_Sure && $x > $Sure_x_Start && $x < $Sure_x_End) {
+                $Pixel_Step = 1;
+            } else {
+                $Pixel_Step = $Pixel_Step_def;
+            }
 
-            for( $y=0; $y < $h ; $y+=$Pixel_Step){
-                if( $Use_y_Sure && $y > $Sure_y_Start && $y < $Sure_y_End ) $Pixel_Step = 1;else $Pixel_Step = $Pixel_Step_def;
+            for ($y = 0; $y < $h; $y += $Pixel_Step) {
+                if ($Use_y_Sure && $y > $Sure_y_Start && $y < $Sure_y_End) {
+                    $Pixel_Step = 1;
+                } else {
+                    $Pixel_Step = $Pixel_Step_def;
+                }
 
-                $c = imagecolorat($src,$x,$y);
+                $c = imagecolorat($src, $x, $y);
 
-                $_x = ($x - $Radius) /2;
-                $_y = ($y - $Radius) /2;
-                $Inner_Circle = ( ( ($_x*$_x) + ($_y*$_y) ) < ($r*$r) );
-                $top_Left = ($x > $Radius || $y > $Radius) || $Inner_Circle;
+                $_x           = ($x - $Radius) / 2;
+                $_y           = ($y - $Radius) / 2;
+                $Inner_Circle = ((($_x * $_x) + ($_y * $_y)) < ($r * $r));
+                $top_Left     = ($x > $Radius || $y > $Radius) || $Inner_Circle;
 
-                $_x = ($x - $Radius) /2 - ($w/2 - $Radius);
-                $_y = ($y - $Radius) /2;
-                $Inner_Circle = ( ( ($_x*$_x) + ($_y*$_y) ) < ($r*$r) );
-                $top_Right = ($x < ($w - $Radius) || $y > $Radius) || $Inner_Circle;
+                $_x           = ($x - $Radius) / 2 - ($w / 2 - $Radius);
+                $_y           = ($y - $Radius) / 2;
+                $Inner_Circle = ((($_x * $_x) + ($_y * $_y)) < ($r * $r));
+                $top_Right    = ($x < ($w - $Radius) || $y > $Radius) || $Inner_Circle;
 
-                $_x = ($x - $Radius) /2;
-                $_y = ($y - $Radius) /2 - ($h/2 - $Radius);
-                $Inner_Circle = ( ( ($_x*$_x) + ($_y*$_y) ) < ($r*$r) );
-                $Bottom_Left =  ($x > $Radius || $y < ($h - $Radius) ) || $Inner_Circle;
+                $_x           = ($x - $Radius) / 2;
+                $_y           = ($y - $Radius) / 2 - ($h / 2 - $Radius);
+                $Inner_Circle = ((($_x * $_x) + ($_y * $_y)) < ($r * $r));
+                $Bottom_Left  = ($x > $Radius || $y < ($h - $Radius)) || $Inner_Circle;
 
-                $_x = ($x - $Radius) /2 - ($w/2 - $Radius);
-                $_y = ($y - $Radius) /2 - ($h/2 - $Radius);
-                $Inner_Circle = ( ( ($_x*$_x) + ($_y*$_y) ) < ($r*$r) );
-                $Bottom_Right = ($x < ($w - $Radius) || $y < ($h - $Radius) ) || $Inner_Circle;
+                $_x           = ($x - $Radius) / 2 - ($w / 2 - $Radius);
+                $_y           = ($y - $Radius) / 2 - ($h / 2 - $Radius);
+                $Inner_Circle = ((($_x * $_x) + ($_y * $_y)) < ($r * $r));
+                $Bottom_Right = ($x < ($w - $Radius) || $y < ($h - $Radius)) || $Inner_Circle;
 
-                if($top_Left && $top_Right && $Bottom_Left && $Bottom_Right ){
+                if ($top_Left && $top_Right && $Bottom_Left && $Bottom_Right) {
 
-                    imagesetpixel($newpic,$x,$y,$c);
+                    imagesetpixel($newpic, $x, $y, $c);
 
-                }else{
-                    imagesetpixel($newpic,$x,$y,$transparent);
+                } else {
+                    imagesetpixel($newpic, $x, $y, $transparent);
                 }
 
             }
         }
-
 
 
         imagesavealpha($newpic, true);
@@ -682,29 +785,31 @@ class BadgeGenerator
         imagedestroy($src);
 
     }
-    //resize and crop image by center
-    function resize_crop_image($max_width, $max_height, $source_file, $dst_dir, $quality = 80){
-        $imgsize = getimagesize($source_file);
-        $width = $imgsize[0];
-        $height = $imgsize[1];
-        $mime = $imgsize['mime'];
 
-        switch($mime){
+    //resize and crop image by center
+    function resize_crop_image($max_width, $max_height, $source_file, $dst_dir, $quality = 80)
+    {
+        $imgsize = getimagesize($source_file);
+        $width   = $imgsize[0];
+        $height  = $imgsize[1];
+        $mime    = $imgsize['mime'];
+
+        switch ($mime) {
             case 'image/gif':
                 $image_create = "imagecreatefromgif";
-                $image = "imagegif";
+                $image        = "imagegif";
                 break;
 
             case 'image/png':
                 $image_create = "imagecreatefrompng";
-                $image = "imagepng";
-                $quality = 7;
+                $image        = "imagepng";
+                $quality      = 7;
                 break;
 
             case 'image/jpeg':
                 $image_create = "imagecreatefromjpeg";
-                $image = "imagejpeg";
-                $quality = 80;
+                $image        = "imagejpeg";
+                $quality      = 80;
                 break;
 
             default:
@@ -715,15 +820,15 @@ class BadgeGenerator
         $dst_img = imagecreatetruecolor($max_width, $max_height);
         $src_img = $image_create($source_file);
 
-        $width_new = $height * $max_width / $max_height;
+        $width_new  = $height * $max_width / $max_height;
         $height_new = $width * $max_height / $max_width;
         //if the new width is greater than the actual width of the image, then the height is too large and the rest cut off, or vice versa
-        if($width_new > $width){
+        if ($width_new > $width) {
             //cut point by height
             $h_point = (($height - $height_new) / 2);
             //copy image
             imagecopyresampled($dst_img, $src_img, 0, 0, 0, $h_point, $max_width, $max_height, $width, $height_new);
-        }else{
+        } else {
             //cut point by width
             $w_point = (($width - $width_new) / 2);
             imagecopyresampled($dst_img, $src_img, 0, 0, $w_point, 0, $max_width, $max_height, $width_new, $height);
@@ -731,7 +836,11 @@ class BadgeGenerator
 
         $image($dst_img, $dst_dir, $quality);
 
-        if($dst_img)imagedestroy($dst_img);
-        if($src_img)imagedestroy($src_img);
+        if ($dst_img) {
+            imagedestroy($dst_img);
+        }
+        if ($src_img) {
+            imagedestroy($src_img);
+        }
     }
 }
