@@ -166,12 +166,22 @@ class ButtonSubscriber extends CommonSubscriber
                 'iconClass' => $icon,
                 'priority'  => $priority,
             ];
+        // list view
         $event
             ->addButton(
                 $button,
                 ButtonHelper::LOCATION_LIST_ACTIONS,
                 'mautic_'.$context.'_index'
             );
+
+        // detail button
+        $event
+            ->addButton(
+                $button,
+                ButtonHelper::LOCATION_PAGE_ACTIONS,
+                ['mautic_'.$context.'_action', ['objectAction' => 'view']]
+            );
+
     }
 
     /**

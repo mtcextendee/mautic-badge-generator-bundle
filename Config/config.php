@@ -71,8 +71,8 @@ return [
                     'mautic.badge.barcode.generator',
                     'mautic.badge.qrcode.generator',
                     'templating.helper.assets',
-                    'mautic.helper.paths'
-
+                    'mautic.helper.paths',
+                    'mautic.badge.url.generator'
                 ],
             ],
             'mautic.badge.barcode.generator' => [
@@ -97,7 +97,8 @@ return [
                 'class'     => \MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeUrlGenerator::class,
                 'arguments' => [
                     'router',
-                    'mautic.badge.hash.generator'
+                    'mautic.badge.hash.generator',
+                    'mautic.helper.encryption'
                 ],
             ],
 
@@ -106,6 +107,14 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.security'
+                ],
+            ],
+
+            'mautic.badge.rounded.image.generator' => [
+                'class'     => \MauticPlugin\MauticBadgeGeneratorBundle\Generator\RoundedImageGenerator::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.paths'
                 ],
             ],
         ],
@@ -153,17 +162,16 @@ return [
             ],
         ],
         'public' => [
-            'mautic_badge_generator_event' => [
-                'path'       => '/badge/generator_test',
-                'controller' => 'MauticBadgeGeneratorBundle:BadgeGenerator:send',
-            ],
-
             'mautic_badge_generator_generate' => [
                 'path'       => '/badge/generator/{objectId}/{contactId}/{hash}',
                 'controller' => 'MauticBadgeGeneratorBundle:Badge:generate',
                 'defaults'   => [
                     'hash' => '',
                 ],
+            ],
+            'mautic_badge_generator_image_rounded' => [
+                'path'       => '/badge/image/rounded/{encryptImageUrl}/{width}',
+                'controller' => 'MauticBadgeGeneratorBundle:Badge:image',
             ],
         ],
     ],
@@ -218,5 +226,6 @@ return [
         'badge_image_directory'         => 'badges',
         'badge_custom_font_path_to_ttf' => false,
         'badge_text_block_count' => 4,
+        'rounded_image_directory'=>'badge'
     ],
 ];

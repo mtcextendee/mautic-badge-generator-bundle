@@ -23,6 +23,7 @@ use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
 use MauticPlugin\MauticBadgeGeneratorBundle\Generator\Crate\ContactFieldCrate;
 use MauticPlugin\MauticBadgeGeneratorBundle\Generator\Crate\PropertiesCrate;
 use MauticPlugin\MauticBadgeGeneratorBundle\Model\BadgeModel;
+use MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeUrlGenerator;
 use MauticPlugin\MauticBadgeGeneratorBundle\Uploader\BadgeUploader;
 use setasign\Fpdi\Tcpdf\Fpdi;
 
@@ -93,6 +94,11 @@ class BadgeGenerator
     private $pathsHelper;
 
     /**
+     * @var BadgeUrlGenerator
+     */
+    private $badgeUrlGenerator;
+
+    /**
      * BadgeGenerator constructor.
      *
      * @param BadgeModel           $badgeModel
@@ -104,6 +110,7 @@ class BadgeGenerator
      * @param QRcodeGenerator      $QRcodeGenerator
      * @param AssetsHelper         $assetsHelper
      * @param PathsHelper          $pathsHelper
+     * @param BadgeUrlGenerator    $badgeUrlGenerator
      */
     public function __construct(
         BadgeModel $badgeModel,
@@ -114,7 +121,8 @@ class BadgeGenerator
         BarcodeGenerator $barcodeGenerator,
         QRcodeGenerator $QRcodeGenerator,
         AssetsHelper $assetsHelper,
-        PathsHelper $pathsHelper
+        PathsHelper $pathsHelper,
+        BadgeUrlGenerator $badgeUrlGenerator
     ) {
         $this->badgeModel           = $badgeModel;
         $this->leadModel            = $leadModel;
@@ -125,6 +133,7 @@ class BadgeGenerator
         $this->QRcodeGenerator      = $QRcodeGenerator;
         $this->assetsHelper         = $assetsHelper;
         $this->pathsHelper          = $pathsHelper;
+        $this->badgeUrlGenerator = $badgeUrlGenerator;
     }
 
     /**
@@ -253,8 +262,9 @@ class BadgeGenerator
                 continue;
             }
 
+            $avatar = ArrayHelper::getValue('avatar', $badge->getProperties()['image'.$i], false);
             $field = ArrayHelper::getValue('fields', $badge->getProperties()['image'.$i], false);
-            if (empty($field)) {
+            if (empty($field) && empty($avatar)) {
                 continue;
             }
 
@@ -263,6 +273,7 @@ class BadgeGenerator
             $width     = ArrayHelper::getValue('width', $badge->getProperties()['image'.$i], 100);
             $height    = ArrayHelper::getValue('height', $badge->getProperties()['image'.$i], 100);
             $align     = ArrayHelper::getValue('align', $badge->getProperties()['image'.$i], 'C');
+            $rounded     = ArrayHelper::getValue('rounded', $badge->getProperties()['image'.$i], false);
             if ($align !== 'C') {
                 $align = '';
             }
@@ -271,15 +282,18 @@ class BadgeGenerator
             //  $pdf->SetXY($positionX, $positionY);
             $image = '';
             if ($hash) {
-                if (!empty($this->badge->getProperties()['image'.$i]['avatar'])) {
+                if (!empty($avatar)) {
                     $image = $this->getAvatar();
                 } else {
                     $image = $this->getCustomImage('image'.$i);
                 }
             } else {
-                $image = $this->getCustomImage('image'.$i, 'https://placehold.co/300x200.jpg');
+                $image = $this->getCustomImage('image'.$i, 'https://placehold.co/300x300.png');
             }
 
+            if ($rounded) {
+                $image = $this->badgeUrlGenerator->getLinkToRoundedImage($image, $width);
+            }
             if (filter_var($image, FILTER_VALIDATE_URL)) {
                 switch (exif_imagetype($image)) {
                     case IMG_GIF:
@@ -297,11 +311,10 @@ class BadgeGenerator
                         $type = 'JPG';
                 }
 //Start Graphic Transformation
-               // $pdf->StartTransform();
+                // $pdf->StartTransform();
 
 // set clipping mask
-              //  $pdf->Circle($positionX+($width/2), ($height/2)+$positionY, ($width/2)-20, 0,360,  'CNZ', [], [255,255,2]);
-
+                //  $pdf->Circle($positionX+($width/2), ($height/2)+$positionY, ($width/2)-20, 0,360,  'CNZ', [], [255,255,2]);
                 $pdf->Image(
                     $image,
                     $positionX,
@@ -317,9 +330,9 @@ class BadgeGenerator
                     false,
                     false,
                     0,
-                    true,
+                    'CT',
                     false,
-                    true
+                    false
                 );
             }
 
@@ -368,6 +381,9 @@ class BadgeGenerator
         }
 
         $pdf->AddPage();
+        $pdf->SetAutoPageBreak(TRUE, 0);
+        $pdf->SetMargins(0, 0, 0);
+
 
         return $pdf;
     }
@@ -380,7 +396,15 @@ class BadgeGenerator
      */
     private function getCustomImage($block, $default = null)
     {
-        return $this->getCustomTextFromFields($block, $default);
+        $image = $this->getCustomTextFromFields($block, $default);
+        $fields = $this->getFields($block);
+        $field = reset($fields);
+        if ($this->contact && $field == 'country' && $image) {
+            if ($flagImage = $this->assetsHelper->getCountryFlag($image, true)) {
+                $image =  $this->coreParametersHelper->getParameter('site_url').$flagImage;
+            }
+        }
+        return $image;
     }
 
     /**
@@ -404,7 +428,8 @@ class BadgeGenerator
      */
     private function getContactFieldValue($alias, $default = null)
     {
-        return $this->contact ? $this->contact->getFieldValue($alias) : ($default ? $default : $alias);
+        $fieldValue = $this->contact->getFieldValue($alias);
+        return $this->contact ?  $fieldValue : ($default ? $default : $alias);
     }
 
     /**
@@ -414,16 +439,28 @@ class BadgeGenerator
      */
     private function getCustomTextFromFields($block, $default = null)
     {
-        $fields = $this->badge->getProperties()[$block]['fields'];
-        if (!is_array($fields)) {
-            $fields = [$fields];
-        }
+        $fields = $this->getFields($block);
         $text = [];
         foreach ($fields as $field) {
             $text[] = $this->getContactFieldValue($field, $default);
         }
 
         return implode(' ', $text);
+    }
+
+    /**
+     * @param string $block
+     *
+     * @return array
+     */
+    private function getFields($block)
+    {
+        $fields = $this->badge->getProperties()[$block]['fields'];
+        if (!is_array($fields)) {
+            $fields = [$fields];
+        }
+
+        return $fields;
     }
 
 
@@ -524,4 +561,177 @@ class BadgeGenerator
         throw new \Exception('Access denied');
     }
 
+    public function
+    Crop_ByRadius($source_url,$Radius="0px" ,$Keep_SourceFile = TRUE){
+
+        /*
+            Output File is png, Because for crop we need transparent color
+
+            if success :: this function returns url of Created File
+            if Fial :: returns FALSE
+
+            $Radius Input Examples ::
+                                100     => 100px
+                                100px   => 100px
+                                50%     => 50%
+        */
+
+        if( $Radius == NULL )
+            return FALSE;
+
+
+
+
+        $ImageInfo = getimagesize($source_url);
+        $w = $ImageInfo[0];
+        $h = $ImageInfo[1];
+        $mime = $ImageInfo['mime'];
+
+        if( $mime != "image/jpeg" && $mime != "image/jpg" && $mime != "image/png")
+            return FALSE;
+
+        if( strpos($Radius,"%") !== FALSE ){
+            //$Radius by Cent
+            $Radius = intval( str_replace("%","",$Radius) );
+            $Smallest_Side = $w <= $h ? $w : $h;
+            $Radius = $Smallest_Side * $Radius / 100;
+
+        }else{
+            $Radius = strtolower($Radius);
+            $Radius = str_replace("px","",$Radius);
+        }
+
+        $Radius = is_numeric($Radius) ? intval($Radius) : 0;
+
+        if( $Radius == 0 ) return FALSE;
+        $src = imagecreatefromstring(file_get_contents($source_url));
+        $newpic = imagecreatetruecolor($w,$h);
+        imagealphablending($newpic,false);
+        $transparent = imagecolorallocatealpha($newpic, 0, 0, 0, 127);
+        //$transparent = imagecolorallocatealpha($newpic, 255, 0, 0, 0);//RED For Test
+
+        $r = $Radius / 2;
+
+        /********************** Pixel step config ********************************/
+
+        $Pixel_Step_def = 0.4;//smaller step take longer time! if set $Pixel_Step=0.1 result is better than  $Pixel_Step=1 but it take longer time!
+
+        //We select the pixels we are sure are in range, to Take up the bigger steps and shorten the processing time
+
+        $Sure_x_Start = $Radius +1;
+        $Sure_x_End = $w - $Radius -1;
+        $Sure_y_Start = $Radius +1;
+        $Sure_y_End = $h - $Radius -1;
+        if( $w <= $h ){
+            //We want to use the larger side to make processing shorter
+            $Use_x_Sure = FALSE;
+            $Use_y_Sure = TRUE;
+        }else{
+            $Use_x_Sure = TRUE;
+            $Use_y_Sure = FALSE;
+        }
+        /********************** Pixel step config END********************************/
+
+        $Pixel_Step = $Pixel_Step_def;
+        for( $x=0; $x < $w ; $x+=$Pixel_Step ){
+
+            if( $Use_x_Sure && $x > $Sure_x_Start && $x < $Sure_x_End ) $Pixel_Step = 1;else $Pixel_Step = $Pixel_Step_def;
+
+            for( $y=0; $y < $h ; $y+=$Pixel_Step){
+                if( $Use_y_Sure && $y > $Sure_y_Start && $y < $Sure_y_End ) $Pixel_Step = 1;else $Pixel_Step = $Pixel_Step_def;
+
+                $c = imagecolorat($src,$x,$y);
+
+                $_x = ($x - $Radius) /2;
+                $_y = ($y - $Radius) /2;
+                $Inner_Circle = ( ( ($_x*$_x) + ($_y*$_y) ) < ($r*$r) );
+                $top_Left = ($x > $Radius || $y > $Radius) || $Inner_Circle;
+
+                $_x = ($x - $Radius) /2 - ($w/2 - $Radius);
+                $_y = ($y - $Radius) /2;
+                $Inner_Circle = ( ( ($_x*$_x) + ($_y*$_y) ) < ($r*$r) );
+                $top_Right = ($x < ($w - $Radius) || $y > $Radius) || $Inner_Circle;
+
+                $_x = ($x - $Radius) /2;
+                $_y = ($y - $Radius) /2 - ($h/2 - $Radius);
+                $Inner_Circle = ( ( ($_x*$_x) + ($_y*$_y) ) < ($r*$r) );
+                $Bottom_Left =  ($x > $Radius || $y < ($h - $Radius) ) || $Inner_Circle;
+
+                $_x = ($x - $Radius) /2 - ($w/2 - $Radius);
+                $_y = ($y - $Radius) /2 - ($h/2 - $Radius);
+                $Inner_Circle = ( ( ($_x*$_x) + ($_y*$_y) ) < ($r*$r) );
+                $Bottom_Right = ($x < ($w - $Radius) || $y < ($h - $Radius) ) || $Inner_Circle;
+
+                if($top_Left && $top_Right && $Bottom_Left && $Bottom_Right ){
+
+                    imagesetpixel($newpic,$x,$y,$c);
+
+                }else{
+                    imagesetpixel($newpic,$x,$y,$transparent);
+                }
+
+            }
+        }
+
+
+
+        imagesavealpha($newpic, true);
+        header('Content-type: image/png');
+        imagepng($newpic);
+        imagedestroy($newpic);
+        imagedestroy($src);
+
+    }
+    //resize and crop image by center
+    function resize_crop_image($max_width, $max_height, $source_file, $dst_dir, $quality = 80){
+        $imgsize = getimagesize($source_file);
+        $width = $imgsize[0];
+        $height = $imgsize[1];
+        $mime = $imgsize['mime'];
+
+        switch($mime){
+            case 'image/gif':
+                $image_create = "imagecreatefromgif";
+                $image = "imagegif";
+                break;
+
+            case 'image/png':
+                $image_create = "imagecreatefrompng";
+                $image = "imagepng";
+                $quality = 7;
+                break;
+
+            case 'image/jpeg':
+                $image_create = "imagecreatefromjpeg";
+                $image = "imagejpeg";
+                $quality = 80;
+                break;
+
+            default:
+                return false;
+                break;
+        }
+
+        $dst_img = imagecreatetruecolor($max_width, $max_height);
+        $src_img = $image_create($source_file);
+
+        $width_new = $height * $max_width / $max_height;
+        $height_new = $width * $max_height / $max_width;
+        //if the new width is greater than the actual width of the image, then the height is too large and the rest cut off, or vice versa
+        if($width_new > $width){
+            //cut point by height
+            $h_point = (($height - $height_new) / 2);
+            //copy image
+            imagecopyresampled($dst_img, $src_img, 0, 0, 0, $h_point, $max_width, $max_height, $width, $height_new);
+        }else{
+            //cut point by width
+            $w_point = (($width - $width_new) / 2);
+            imagecopyresampled($dst_img, $src_img, 0, 0, $w_point, 0, $max_width, $max_height, $width_new, $height);
+        }
+
+        $image($dst_img, $dst_dir, $quality);
+
+        if($dst_img)imagedestroy($dst_img);
+        if($src_img)imagedestroy($src_img);
+    }
 }
