@@ -57,6 +57,15 @@ In contact list
 
 Library: https://github.com/mautic/api-library
 
+Hook
+
+```php
+$api = new \Mautic\Api\Api($auth, $apiUrl);
+$contactId = 1;
+$badgeId = 2;
+$response = $api->makeRequest(sprintf("badge/generator/%d/%d", $contactId, $badgeId));
+```
+
 Example for Basic Authorization:
 ```php
 // Bootup the Composer autoloader
