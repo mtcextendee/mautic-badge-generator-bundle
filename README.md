@@ -57,8 +57,18 @@ In contact list
 
 Library: https://github.com/mautic/api-library
 
-Example:
+Example for Basic Authorization:
 ```php
+// Bootup the Composer autoloader
+include __DIR__.'/vendor/autoload.php';
+
+use Mautic\Auth\ApiAuth;
+
+$apiUrl = 'http://mautic.site';
+$settings = [
+    'userName' => 'admin',
+    'password' => 'mautic',
+];
 $initAuth = new ApiAuth();
 $auth     = $initAuth->newAuth($settings, 'BasicAuth');
 $api = new \Mautic\Api\Api($auth, $apiUrl);
@@ -74,5 +84,18 @@ echo 'PDF created';
 echo $response['errors'][0]['message'];
 }
 ```
+
+Response:
+
+- If badge exist for contact
+
+`$response['pdf'] = 'base64 encode of PDF content';`
+
+You need base64decode of PDF content and then process it (dispay or save..). For more info check: https://selectpdf.com/web-html-to-pdf-rest-api-for-php-samples/
+
+
+- If badge or contact not exist:
+
+`$response['errors']`
 
 
