@@ -209,11 +209,16 @@ class BadgeGenerator
      */
     public function generate($badgeId, $leadId, $hash = null, $isAdmin = false)
     {
-        $pdf = $this->loadFpdi();
-
-        $pdf = $this->generateBadgeToPDF($badgeId, $leadId, $hash, $isAdmin, $pdf);
+        $pdf = $this->getPDF($badgeId, $leadId, $hash, $isAdmin);
         echo $pdf->Output('custom_pdf_'.time().'.pdf', 'I');
         exit;
+    }
+
+    public function getPDF($badgeId, $leadId, $hash = null, $isAdmin = false)
+    {
+        $pdf = $this->loadFpdi();
+
+        return $this->generateBadgeToPDF($badgeId, $leadId, $hash, $isAdmin, $pdf);
     }
 
     /**
@@ -454,7 +459,6 @@ class BadgeGenerator
                 $this->leadModel->saveEntity($this->contact);
             }
         }
-
         return $pdf;
     }
 
@@ -517,7 +521,7 @@ class BadgeGenerator
      */
     private function getContactFieldValue($alias, $default = null)
     {
-        $fieldValue = $this->contact->getFieldValue($alias);
+        $fieldValue = $this->contact ? $this->contact->getFieldValue($alias) : null;
 
         return $this->contact ? $fieldValue : ($default ? $default : $alias);
     }

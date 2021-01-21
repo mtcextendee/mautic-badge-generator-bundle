@@ -53,3 +53,26 @@ In contact list
 
 ![image](https://user-images.githubusercontent.com/462477/55949107-25a2a300-5c52-11e9-9a7d-8e84bcb4f851.png)
 
+### API
+
+Library: https://github.com/mautic/api-library
+
+Example:
+```php
+$initAuth = new ApiAuth();
+$auth     = $initAuth->newAuth($settings, 'BasicAuth');
+$api = new \Mautic\Api\Api($auth, $apiUrl);
+$contactId = 1;
+$badgeId = 2;
+$response = $api->makeRequest(sprintf("badge/generator/%d/%d", $contactId, $badgeId));
+if (isset($response['pdf'])) {
+$result = base64_decode($response['pdf']);
+// Write on file
+file_put_contents('test.pdf', $result);
+echo 'PDF created';
+} elseif (isset($response['errors'][0]['message'])) {
+echo $response['errors'][0]['message'];
+}
+```
+
+

@@ -143,6 +143,13 @@ return [
         ]
     ],
     'routes'      => [
+        'api'    => [
+            'mautic_badge_generator_get' => [
+                'path'       => '/badge/generator/{contactId}/{badgeId}',
+                'controller' => 'MauticBadgeGeneratorBundle:Api\BadgeApi:get',
+                'method'     => 'GET',
+            ],
+        ],
         'main' =>[
             'mautic_badge_generator_index'  => [
                 'path'       => '/badge/generator/{page}',

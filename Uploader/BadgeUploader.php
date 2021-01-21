@@ -193,12 +193,22 @@ class BadgeUploader
      */
     private function getBadgeImagePath($fullPath = false)
     {
+        $imagesAbsoluteDirectory = $this->pathsHelper->getSystemPath(
+            'images',
+            true
+        );
+        $badgesDirectory         = DIRECTORY_SEPARATOR.$this->coreParametersHelper->getParameter(
+                'badge_image_directory'
+            ).DIRECTORY_SEPARATOR;
+
+        if (!file_exists($imagesAbsoluteDirectory.$badgesDirectory)) {
+            mkdir($imagesAbsoluteDirectory.$badgesDirectory);
+        }
+
         return $this->pathsHelper->getSystemPath(
                 'images',
                 $fullPath
-            ).DIRECTORY_SEPARATOR.$this->coreParametersHelper->getParameter(
-                'badge_image_directory'
-            ).DIRECTORY_SEPARATOR;
+            ).$badgesDirectory;
     }
 
     /**
