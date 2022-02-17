@@ -16,12 +16,10 @@ use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
 
 class BadgeEvent extends CommonEvent
 {
-
     /**
      * BadgeEvent constructor.
      *
-     * @param Badge $entity
-     * @param bool  $isNew
+     * @param bool $isNew
      */
     public function __construct(Badge $entity, $isNew = false)
     {
@@ -37,9 +35,6 @@ class BadgeEvent extends CommonEvent
         return $this->entity;
     }
 
-    /**
-     * @param Badge $entity
-     */
     public function setEntity(Badge $entity)
     {
         $this->entity = $entity;

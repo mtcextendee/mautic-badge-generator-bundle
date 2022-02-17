@@ -26,7 +26,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class BadgeType extends AbstractType
 {
-
     /**
      * @var EntityManager
      */
@@ -34,22 +33,14 @@ class BadgeType extends AbstractType
 
     /**
      * BadgeType conastructor.
-     *
-     * @param EntityManager     $em
      */
     public function __construct(EntityManager $em)
     {
-
         $this->em = $em;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
         $builder->addEventSubscriber(new CleanFormSubscriber(['properties' => 'clean']));
 
         $builder->add(
@@ -67,8 +58,8 @@ class BadgeType extends AbstractType
                         [
                             'message' => 'mautic.core.value.required',
                         ]
-                    )
-                ]
+                    ),
+                ],
             ]
         );
 
@@ -83,8 +74,8 @@ class BadgeType extends AbstractType
             StageListType::class,
             [
                 'label'       => 'mautic.plugin.badge.generator.form.stage',
-                'placeholder'=> '',
-                'multiple'=> false,
+                'placeholder' => '',
+                'multiple'    => false,
                 'required'    => false,
             ]
         )->addModelTransformer($transformer)
@@ -130,8 +121,8 @@ class BadgeType extends AbstractType
                         [
                             'message' => 'mautic.core.value.required',
                         ]
-                    )
-                ]
+                    ),
+                ],
             ]
         );
 
@@ -150,8 +141,8 @@ class BadgeType extends AbstractType
                         [
                             'message' => 'mautic.core.value.required',
                         ]
-                    )
-                ]
+                    ),
+                ],
             ]
         );
 
@@ -168,7 +159,6 @@ class BadgeType extends AbstractType
                 'data'       => $options['data']->getProperties(),
             ]
         );
-
 
         $builder->add(
             'buttons',

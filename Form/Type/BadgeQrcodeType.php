@@ -22,10 +22,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class BadgeQrcodeType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -47,7 +43,7 @@ class BadgeQrcodeType extends AbstractType
                 'label'       => 'mautic.plugin.badge.generator.form.qrcode.field',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => [
-                    'class'   => 'form-control',
+                    'class'        => 'form-control',
                     'data-show-on' => '{"badge_properties_qrcode_contactId_0":"checked"}',
                 ],
                 'required'    => false,
@@ -61,8 +57,8 @@ class BadgeQrcodeType extends AbstractType
             ChoiceType::class,
             [
                 'choices' => array_flip([
-                    'C'=>'mautic.core.center',
-                    ''=>'mautic.core.left',
+                    'C'=> 'mautic.core.center',
+                    '' => 'mautic.core.left',
                 ]),
                 'label'      => 'mautic.plugin.badge.generator.form.text.align',
                 'label_attr' => ['class' => 'control-label'],
@@ -109,7 +105,7 @@ class BadgeQrcodeType extends AbstractType
                 'attr'       => [
                     'class'        => 'form-control',
                 ],
-                'required' => false
+                'required' => false,
             ]
         );
 
@@ -122,7 +118,7 @@ class BadgeQrcodeType extends AbstractType
                 'attr'       => [
                     'class'        => 'form-control',
                 ],
-                'required' => false
+                'required' => false,
             ]
         );
 
@@ -134,9 +130,9 @@ class BadgeQrcodeType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
-                    'data-toggle' => 'color',
+                    'data-toggle'  => 'color',
                 ],
-                'required' => false
+                'required' => false,
             ]
         );
 
@@ -148,25 +144,24 @@ class BadgeQrcodeType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
-                    'data-toggle' => 'color',
+                    'data-toggle'  => 'color',
                 ],
-                'required' => false
+                'required' => false,
             ]
         );
 
         $builder->add('error_correction_level', ChoiceType::class, [
             'choices'  => array_flip([
-                ErrorCorrectionLevel::LOW=>ErrorCorrectionLevel::LOW,
-                ErrorCorrectionLevel::QUARTILE=>ErrorCorrectionLevel::QUARTILE,
-                ErrorCorrectionLevel::MEDIUM=>ErrorCorrectionLevel::MEDIUM,
-                ErrorCorrectionLevel::HIGH=>ErrorCorrectionLevel::HIGH,
+                ErrorCorrectionLevel::LOW     => ErrorCorrectionLevel::LOW,
+                ErrorCorrectionLevel::QUARTILE=> ErrorCorrectionLevel::QUARTILE,
+                ErrorCorrectionLevel::MEDIUM  => ErrorCorrectionLevel::MEDIUM,
+                ErrorCorrectionLevel::HIGH    => ErrorCorrectionLevel::HIGH,
             ]),
-            'label'    => 'mautic.plugin.barcode.form.error_correction_level',
-            'required' => true,
-            'placeholder'=>false,
-            'attr'     => [
+            'label'      => 'mautic.plugin.barcode.form.error_correction_level',
+            'required'   => true,
+            'placeholder'=> false,
+            'attr'       => [
             ],
         ]);
-
     }
 }

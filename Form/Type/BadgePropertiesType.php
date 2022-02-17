@@ -21,7 +21,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class BadgePropertiesType extends AbstractType
 {
-
     /**
      * @var IntegrationHelper
      */
@@ -34,33 +33,25 @@ class BadgePropertiesType extends AbstractType
 
     /**
      * BadgePropertiesType constructor.
-     *
-     * @param IntegrationHelper $integrationHelper
      */
     public function __construct(IntegrationHelper $integrationHelper, TranslatorInterface $translator)
     {
-
         $this->integrationHelper = $integrationHelper;
         $this->translator        = $translator;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
         $integration = $this->integrationHelper->getIntegrationObject('BadgeGenerator');
 
-        if ($integration && $integration->getIntegrationSettings()->getIsPublished() === true) {
+        if ($integration && true === $integration->getIntegrationSettings()->getIsPublished()) {
             $settings           = $integration->mergeConfigToFeatureSettings();
             $numberOfTextBlocks = ArrayHelper::getValue(
                 'numberOfTextBlocks',
                 $settings,
                 BadgeGenerator::NUMBER_OF_DEFAULT_TEXT_BLOCKS
             );
-            for ($i = 1; $i <= $numberOfTextBlocks; $i++) {
+            for ($i = 1; $i <= $numberOfTextBlocks; ++$i) {
                 $data          = ArrayHelper::getValue('text'.$i, $options['data'], []);
                 $data['index'] = $i;
                 $builder->add(
@@ -78,7 +69,7 @@ class BadgePropertiesType extends AbstractType
                 $settings,
                 BadgeGenerator::NUMBER_OF_DEFAULT_IMAGES_BLOCKS
             );
-            for ($i = 1; $i <= $numberOfImagesBlocks; $i++) {
+            for ($i = 1; $i <= $numberOfImagesBlocks; ++$i) {
                 $data          = ArrayHelper::getValue('image'.$i, $options['data'], []);
                 $data['index'] = $i;
                 $builder->add(
@@ -111,7 +102,7 @@ class BadgePropertiesType extends AbstractType
 
         $integration = $this->integrationHelper->getIntegrationObject('BarcodeGenerator');
 
-        if ($integration && $integration->getIntegrationSettings()->getIsPublished() === true) {
+        if ($integration && true === $integration->getIntegrationSettings()->getIsPublished()) {
             $builder->add(
                 'barcode',
                 BadgeBarcodeType::class,
@@ -135,7 +126,6 @@ class BadgePropertiesType extends AbstractType
             );
         }
 
-
         $builder->add(
             'mapping',
             BadgeMapping::class,
@@ -146,7 +136,6 @@ class BadgePropertiesType extends AbstractType
                 'data'       => ArrayHelper::getValue('mapping', $options['data']),
             ]
         );
-
 
         $builder->add(
             'restriction',

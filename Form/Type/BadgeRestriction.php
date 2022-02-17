@@ -17,10 +17,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class BadgeRestriction extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('segment', LeadListType::class, [

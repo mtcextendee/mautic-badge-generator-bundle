@@ -17,7 +17,6 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class BadgeHashGenerator
 {
-
     /**
      * @var CoreParametersHelper
      */
@@ -30,13 +29,11 @@ class BadgeHashGenerator
 
     /**
      * BadgeHashGenerator constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(CoreParametersHelper $coreParametersHelper, CorePermissions $corePermissions)
     {
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->corePermissions = $corePermissions;
+        $this->corePermissions      = $corePermissions;
     }
 
     /**
@@ -56,7 +53,6 @@ class BadgeHashGenerator
         }
 
         return false;
-
     }
 
     /**
@@ -66,8 +62,9 @@ class BadgeHashGenerator
      */
     public function getHashId($contactId)
     {
-       $key =  $contactId.'-'.$this->coreParametersHelper->getParameter('secret_key');
-       return hash('sha1', $key);
+        $key =  $contactId.'-'.$this->coreParametersHelper->getParameter('secret_key');
+
+        return hash('sha1', $key);
     }
 
     /**

@@ -40,25 +40,17 @@ class BadgeTextType extends AbstractType
 
     /**
      * BadgeTextType constructor.
-     *
-     * @param FieldModel    $fieldModel
-     * @param BadgeUploader $badgeUploader
      */
     public function __construct(FieldModel $fieldModel, BadgeUploader $badgeUploader)
     {
-
-        $this->fieldModel = $fieldModel;
+        $this->fieldModel    = $fieldModel;
         $this->badgeUploader = $badgeUploader;
     }
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
         $formModifier = function (FormInterface $form, $currentColumns) {
-            $order = [];
+            $order        = [];
             $orderColumns = [];
             if (!empty($currentColumns)) {
                 $orderColumns = array_values($currentColumns);
@@ -70,16 +62,16 @@ class BadgeTextType extends AbstractType
                 [
                     'label'      => 'mautic.plugin.badge.generator.form.fields',
                     'label_attr' => ['class' => 'control-label'],
-                    'choices'=> $this->fieldModel->getFieldList(false),
+                    'choices'    => $this->fieldModel->getFieldList(false),
                     'attr'       => [
-                        'class' => 'form-control multiselect',
+                        'class'         => 'form-control multiselect',
                         'data-sortable' => 'true',
                         'data-order'    => $order,
                     ],
-                    'required'   => false,
-                    'multiple'   => true,
+                    'required'    => false,
+                    'multiple'    => true,
                     'expanded'    => false,
-                    'data' => $orderColumns,
+                    'data'        => $orderColumns,
                 ]
             );
         };
@@ -117,51 +109,50 @@ class BadgeTextType extends AbstractType
         );
 
         $coreFonts = [
-            "times",
-            "symbol",
-            "timesb",
-            "timesi",
-            "aefurat",
-            "courier",
-            "timesbi",
-            "courierb",
-            "courieri",
-            "freemono",
-            "freesans",
-            "courierbi",
-            "freemonob",
-            "freemonoi",
-            "freesansb",
-            "freesansi",
-            "freeserif",
-            "helvetica",
-            "pdfatimes",
-            "dejavusans",
-            "freemonobi",
-            "freesansbi",
-            "freeserifb",
-            "freeserifi",
-            "helveticab",
-            "helveticai",
-            "pdfasymbol",
-            "pdfatimesb",
-            "pdfatimesi",
-            "freeserifbi",
-            "aealarabiya",
-            "dejavusansb",
-            "dejavusansi",
-            "dejavuserif",
-            "helveticabi",
-            "pdfacourier",
-            "pdfatimesbi",
-            "dejavusansbi",
-            "dejavuserifb",
-            "dejavuserifi",
-            "pdfacourierb",
-            "pdfacourieri",
-            "custom",
+            'times',
+            'symbol',
+            'timesb',
+            'timesi',
+            'aefurat',
+            'courier',
+            'timesbi',
+            'courierb',
+            'courieri',
+            'freemono',
+            'freesans',
+            'courierbi',
+            'freemonob',
+            'freemonoi',
+            'freesansb',
+            'freesansi',
+            'freeserif',
+            'helvetica',
+            'pdfatimes',
+            'dejavusans',
+            'freemonobi',
+            'freesansbi',
+            'freeserifb',
+            'freeserifi',
+            'helveticab',
+            'helveticai',
+            'pdfasymbol',
+            'pdfatimesb',
+            'pdfatimesi',
+            'freeserifbi',
+            'aealarabiya',
+            'dejavusansb',
+            'dejavusansi',
+            'dejavuserif',
+            'helveticabi',
+            'pdfacourier',
+            'pdfatimesbi',
+            'dejavusansbi',
+            'dejavuserifb',
+            'dejavuserifi',
+            'pdfacourierb',
+            'pdfacourieri',
+            'custom',
         ];
-
 
         $builder->add(
             'font',
@@ -178,12 +169,10 @@ class BadgeTextType extends AbstractType
             ]
         );
 
-
-
         /** @var \SplFileInfo $uploadedFile */
         $ttfs = [];
         foreach ($this->badgeUploader->getUploadedFiles('*.ttf') as $uploadedFile) {
-            $filename = $uploadedFile->getFilename();
+            $filename        = $uploadedFile->getFilename();
             $ttfs[$filename] = $filename;
         }
         $builder->add(
@@ -194,7 +183,7 @@ class BadgeTextType extends AbstractType
                 'label'       => 'mautic.plugin.badge.generator.form.font.uploaded_fonts',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => [
-                    'class' => 'form-control',
+                    'class'        => 'form-control',
                     'data-show-on' => '{"badge_properties_text'.ArrayHelper::getValue('index', $options['data'], '1').'_font":"custom"}',
                 ],
                 'placeholder' => '',
@@ -210,9 +199,8 @@ class BadgeTextType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'required'   => false,
                 'attr'       => [
-                    'class'   => 'form-control',
+                    'class'        => 'form-control',
                     'data-show-on' => '{"badge_properties_text'.ArrayHelper::getValue('index', $options['data'], '1').'_font":"custom"}',
-
                 ],
                 'mapped'      => false,
                 'constraints' => [
@@ -227,7 +215,6 @@ class BadgeTextType extends AbstractType
                 ],
             ]
         );
-
 
         $builder->add(
             'align',
@@ -244,7 +231,7 @@ class BadgeTextType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'required'    => false,
-                'data'  => isset($options['data']['align']) ? $options['data']['align'] : 'L',
+                'data'        => isset($options['data']['align']) ? $options['data']['align'] : 'L',
                 'placeholder' => false,
             ]
         );
@@ -269,7 +256,7 @@ class BadgeTextType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'data'  => isset($options['data']['position']) ? $options['data']['position'] : 0,
+                'data'       => isset($options['data']['position']) ? $options['data']['position'] : 0,
                 'required'   => false,
             ]
         );
@@ -283,7 +270,7 @@ class BadgeTextType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'data'  => isset($options['data']['positionX']) ? $options['data']['positionX'] : 0,
+                'data'       => isset($options['data']['positionX']) ? $options['data']['positionX'] : 0,
                 'required'   => false,
             ]
         );
@@ -297,7 +284,7 @@ class BadgeTextType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'data'  => isset($options['data']['fontSize']) ? $options['data']['fontSize'] : 30,
+                'data'       => isset($options['data']['fontSize']) ? $options['data']['fontSize'] : 30,
                 'required'   => false,
             ]
         );
@@ -311,7 +298,7 @@ class BadgeTextType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'data'  => isset($options['data']['stretch']) ? $options['data']['stretch'] : 0,
+                'data'       => isset($options['data']['stretch']) ? $options['data']['stretch'] : 0,
                 'required'   => false,
             ]
         );
@@ -325,7 +312,7 @@ class BadgeTextType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'data'  => isset($options['data']['lineHeight']) ? $options['data']['lineHeight'] : 1,
+                'data'       => isset($options['data']['lineHeight']) ? $options['data']['lineHeight'] : 1,
                 'required'   => false,
             ]
         );
@@ -345,8 +332,8 @@ class BadgeTextType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'required'    => false,
-                'data'  => isset($options['data']['style']) ? $options['data']['style'] : [],
-                'multiple' => true,
+                'data'        => isset($options['data']['style']) ? $options['data']['style'] : [],
+                'multiple'    => true,
             ]
         );
     }

@@ -10,13 +10,11 @@
  */
 
 /** @var \MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge $entity */
-
 $isEmbedded = false;
 if (!$isEmbedded) {
     $view->extend('MauticCoreBundle:Default:content.html.php');
 }
 $view['slots']->set('headerTitle', $entity->getName());
-
 
 $customButtons = [];
 if (!$isEmbedded) {
@@ -25,15 +23,15 @@ if (!$isEmbedded) {
         $view->render(
             'MauticCoreBundle:Helper:page_actions.html.php',
             [
-                'item' => $entity,
-                'customButtons' => (isset($customButtons)) ? $customButtons : [],
+                'item'            => $entity,
+                'customButtons'   => (isset($customButtons)) ? $customButtons : [],
                 'templateButtons' => [
                     'edit' => $view['security']->hasEntityAccess(
                         $permissions['lead:leads:editown'],
                         $permissions['lead:leads:editother'],
                         $entity->getCreatedBy()
                     ),
-                    'clone' => $permissions['lead:leads:create'],
+                    'clone'  => $permissions['lead:leads:create'],
                     'delete' => $view['security']->hasEntityAccess(
                         $permissions['lead:leads:deleteown'],
                         $permissions['lead:leads:deleteother'],

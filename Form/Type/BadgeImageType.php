@@ -21,13 +21,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class BadgeImageType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
         $builder->add(
             'avatar',
             YesNoButtonGroupType::class,
@@ -46,7 +41,7 @@ class BadgeImageType extends AbstractType
                 'label'      => 'mautic.plugin.badge.generator.form.fields',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
+                    'class'        => 'form-control',
                     'data-show-on' => '{"badge_properties_image'.$options['data']['index'].'_avatar_0":"checked"}',
                 ],
                 'required'   => false,
@@ -54,17 +49,17 @@ class BadgeImageType extends AbstractType
             ]
         );
 
-       /* $builder->add(
-            'flag',
-            'yesno_button_group',
-            [
-                'label' => 'mautic.plugin.badge.generator.form.flag',
-                'attr'  => [
-                    'data-show-on' => '{"badge_properties_image'.$options['data']['index'].'_fields":"country"}',
-                ],
-                'data'  => isset($options['data']['flag']) ? $options['data']['flag'] : false,
-            ]
-        );*/
+        /* $builder->add(
+             'flag',
+             'yesno_button_group',
+             [
+                 'label' => 'mautic.plugin.badge.generator.form.flag',
+                 'attr'  => [
+                     'data-show-on' => '{"badge_properties_image'.$options['data']['index'].'_fields":"country"}',
+                 ],
+                 'data'  => isset($options['data']['flag']) ? $options['data']['flag'] : false,
+             ]
+         );*/
 
         $builder->add(
             'rounded',
@@ -76,7 +71,6 @@ class BadgeImageType extends AbstractType
                 'data'  => isset($options['data']['rounded']) ? $options['data']['rounded'] : false,
             ]
         );
-
 
         $builder->add(
             'width',
@@ -98,7 +92,7 @@ class BadgeImageType extends AbstractType
                 'label'       => 'mautic.plugin.badge.generator.form.barcode.height',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => [
-                    'class'   => 'form-control',
+                    'class'        => 'form-control',
                     'data-show-on' => '{"badge_properties_image'.$options['data']['index'].'_rounded_0":"checked"}',
                 ],
                 'required'    => false,
@@ -136,7 +130,7 @@ class BadgeImageType extends AbstractType
             ChoiceType::class,
             [
                 'choices' => [
-                    'C'=>'mautic.core.center',
+                    'C'=> 'mautic.core.center',
                     '' => 'mautic.core.left',
                 ],
                 'label'      => 'mautic.plugin.badge.generator.form.text.align',
@@ -148,6 +142,5 @@ class BadgeImageType extends AbstractType
                 'placeholder' => false,
             ]
         );
-
     }
 }

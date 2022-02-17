@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\MauticBadgeGeneratorBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
@@ -20,8 +19,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PageSubscriber implements EventSubscriberInterface
 {
-
-
     /**
      * @var BadgeTokenReplacer
      */
@@ -34,14 +31,11 @@ class PageSubscriber implements EventSubscriberInterface
 
     /**
      * PageSubscriber constructor.
-     *
-     * @param BadgeTokenReplacer $badgeTokenReplacer
-     * @param LeadModel          $leadModel
      */
     public function __construct(BadgeTokenReplacer $badgeTokenReplacer, LeadModel $leadModel)
     {
         $this->badgeTokenReplacer = $badgeTokenReplacer;
-        $this->leadModel = $leadModel;
+        $this->leadModel          = $leadModel;
     }
 
     /**
@@ -54,9 +48,6 @@ class PageSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param PageDisplayEvent $event
-     */
     public function onPageDisplay(PageDisplayEvent $event)
     {
         $content = $event->getContent();

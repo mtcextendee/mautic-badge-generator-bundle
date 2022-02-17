@@ -22,7 +22,6 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class BadgeModel extends FormModel implements AjaxLookupModelInterface
 {
-
     /**
      * Retrieve the permissions base.
      *
@@ -53,11 +52,11 @@ class BadgeModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param null $id
      *
-     * @return null|Badge
+     * @return Badge|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Badge();
         }
 
@@ -148,8 +147,6 @@ class BadgeModel extends FormModel implements AjaxLookupModelInterface
         $results = [];
         switch ($type) {
             case 'badge':
-
-
                 break;
         }
 

@@ -15,7 +15,6 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class BadgeTokenReplacer
 {
-
     /**
      * @var BadgeUrlGenerator
      */
@@ -23,8 +22,6 @@ class BadgeTokenReplacer
 
     /**
      * BadgeTokenReplacer constructor.
-     *
-     * @param BadgeUrlGenerator $badgeUrlGenerator
      */
     public function __construct(BadgeUrlGenerator $badgeUrlGenerator)
     {
@@ -33,7 +30,6 @@ class BadgeTokenReplacer
 
     /**
      * @param string $content
-     * @param Lead|null $contact
      *
      * @return array
      */
@@ -42,18 +38,17 @@ class BadgeTokenReplacer
         $tokens = $this->findTokens($content, $contact);
 
         return str_replace(array_keys($tokens), $tokens, $content);
-
     }
 
     /**
-     * @param string $content
+     * @param string    $content
      * @param Lead|null $contact
      *
      * @return array
      */
     public function findTokens($content, $contact = null)
     {
-        $tokens = [];
+        $tokens    = [];
         $contactId = 0;
         if ($contact instanceof Lead && $contact->getId()) {
             $contactId = $contact->getId();

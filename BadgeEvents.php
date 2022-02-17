@@ -17,7 +17,6 @@ namespace MauticPlugin\MauticBadgeGeneratorBundle;
  */
 final class BadgeEvents
 {
-
     /**
      * The mautic.badge_pre_save event is thrown right before a asset is persisted.
      *
@@ -57,5 +56,4 @@ final class BadgeEvents
      * @var string
      */
     const POST_DELETE = 'mautic.badge_post_delete';
-
 }

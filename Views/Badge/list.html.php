@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticBadgeGeneratorBundle:Badge:index.html.php');
 }
 /* @var \MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge $items */
@@ -53,8 +53,6 @@ if ($tmpl == 'index') {
                         'default'    => true,
                     ]
                 );
-
-
 
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
@@ -128,8 +126,8 @@ if ($tmpl == 'index') {
                         <a href="<?php echo $view['router']->url(
                             'mautic_badge_generator_generate',
                             [
-                                'objectId' => $item->getId(),
-                                'contactId' => 0
+                                'objectId'  => $item->getId(),
+                                'contactId' => 0,
                             ]
                         ); ?>" target="_blank">
                             <?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.example_pdf'); ?>

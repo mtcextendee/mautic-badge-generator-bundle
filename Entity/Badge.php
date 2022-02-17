@@ -54,7 +54,7 @@ class Badge
      */
     protected $dateAdded;
 
-    /** @var  Stage */
+    /** @var Stage */
     protected $stage;
 
     public function __construct()
@@ -62,9 +62,6 @@ class Badge
         $this->setDateAdded(new \DateTime());
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -166,20 +163,16 @@ class Badge
         return $this->dateAdded;
     }
 
-
     public function getCreatedBy()
     {
-
     }
 
     public function getHeader()
     {
-
     }
 
     public function getPublishStatus()
     {
-
     }
 
     /**
@@ -281,6 +274,4 @@ class Badge
 
         return $this;
     }
-
 }
-

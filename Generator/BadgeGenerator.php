@@ -29,11 +29,11 @@ use setasign\Fpdi\Tcpdf\Fpdi;
 
 class BadgeGenerator
 {
-    CONST CUSTOM_FONT_CONFIG_PARAMETER    = 'badge_custom_font_path_to_ttf';
+    const CUSTOM_FONT_CONFIG_PARAMETER    = 'badge_custom_font_path_to_ttf';
 
-    CONST NUMBER_OF_DEFAULT_TEXT_BLOCKS   = 4;
+    const NUMBER_OF_DEFAULT_TEXT_BLOCKS   = 4;
 
-    CONST NUMBER_OF_DEFAULT_IMAGES_BLOCKS = 0;
+    const NUMBER_OF_DEFAULT_IMAGES_BLOCKS = 0;
 
     /**
      * @var BadgeModel
@@ -70,7 +70,7 @@ class BadgeGenerator
      */
     private $integrationHelper;
 
-    /** @var  string */
+    /** @var string */
     private $fontName;
 
     /**
@@ -100,17 +100,6 @@ class BadgeGenerator
 
     /**
      * BadgeGenerator constructor.
-     *
-     * @param BadgeModel           $badgeModel
-     * @param LeadModel            $leadModel
-     * @param BadgeUploader        $badgeUploader
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param IntegrationHelper    $integrationHelper
-     * @param BarcodeGenerator     $barcodeGenerator
-     * @param QRcodeGenerator      $QRcodeGenerator
-     * @param AssetsHelper         $assetsHelper
-     * @param PathsHelper          $pathsHelper
-     * @param BadgeUrlGenerator    $badgeUrlGenerator
      */
     public function __construct(
         BadgeModel $badgeModel,
@@ -137,8 +126,6 @@ class BadgeGenerator
     }
 
     /**
-     * @param Lead $contact
-     *
      * @return array
      */
     private function getContactBadges(Lead $contact)
@@ -157,7 +144,6 @@ class BadgeGenerator
 
         return $contactBadges;
     }
-
 
     public function generateBatch(array $contactIds)
     {
@@ -189,15 +175,12 @@ class BadgeGenerator
         }
         $filename = 'custom_pdf_'.time().'.pdf';
         $pdf->Output($filename, 'I');
-
     }
-
 
     /**
      * @param      $badgeId
      * @param      $leadId
      * @param null $hash
-     *
      * @param bool $isAdmin
      *
      * @throws EntityNotFoundException
@@ -257,15 +240,13 @@ class BadgeGenerator
         $height = $badge->getHeight();
         $pdf->useTemplate($tplIdx, 0, 0, $width, $height, true);
 
-
         $integration = $this->integrationHelper->getIntegrationObject('BarcodeGenerator');
 
         $barcodeProperties = ArrayHelper::getValue('barcode', $badge->getProperties(), []);
 
         $contactFieldCrate = new ContactFieldCrate($this->contact);
 
-        if ($integration && $integration->getIntegrationSettings()->getIsPublished() === true) {
-
+        if ($integration && true === $integration->getIntegrationSettings()->getIsPublished()) {
             // barcode
             $barcodePropertiesCrate = new PropertiesCrate(
                 ArrayHelper::getValue('barcode', $badge->getProperties(), [])
@@ -279,9 +260,7 @@ class BadgeGenerator
             if ($qrcodePropertiesCrate->isEnabled()) {
                 $this->QRcodeGenerator->writeToPdf($pdf, $qrcodePropertiesCrate, $contactFieldCrate);
             }
-
         }
-
 
         $integrationSettings = $this->integrationHelper->getIntegrationObject(
             'BadgeGenerator'
@@ -292,7 +271,7 @@ class BadgeGenerator
             self::NUMBER_OF_DEFAULT_TEXT_BLOCKS
         );
 
-        for ($i = 1; $i <= $numberOfTextBlocks; $i++) {
+        for ($i = 1; $i <= $numberOfTextBlocks; ++$i) {
             if (empty($badge->getProperties()['text'.$i])) {
                 continue;
             }
@@ -312,7 +291,7 @@ class BadgeGenerator
             $stretch    = ArrayHelper::getValue('stretch', $badge->getProperties()['text'.$i], 0);
             $style      = ArrayHelper::getValue('style', $badge->getProperties()['text'.$i], []);
             $font       = ArrayHelper::getValue('font', $badge->getProperties()['text'.$i], $this->fontName);
-            if ($font == 'custom') {
+            if ('custom' == $font) {
                 $ttf = ArrayHelper::getValue('ttf', $badge->getProperties()['text'.$i]);
                 if ($ttf) {
                     $font = \TCPDF_FONTS::addTTFfont(
@@ -328,8 +307,8 @@ class BadgeGenerator
             // reset position
             $pdf->SetXY($positionX, $positionY);
             // set color
-            $hex = '#'.$color;
-            list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
+            $hex             = '#'.$color;
+            list($r, $g, $b) = sscanf($hex, '#%02x%02x%02x');
             $pdf->SetTextColor($r, $g, $b);
             // create cell
             $pdf->setCellHeightRatio($lineHeight);
@@ -349,14 +328,13 @@ class BadgeGenerator
             );
         }
 
-
         $numberOfImagesBlocks = ArrayHelper::getValue(
             'numberOfImagesBlocks',
             $integrationSettings,
             self::NUMBER_OF_DEFAULT_IMAGES_BLOCKS
         );
 
-        for ($i = 1; $i <= $numberOfImagesBlocks; $i++) {
+        for ($i = 1; $i <= $numberOfImagesBlocks; ++$i) {
             if (empty($badge->getProperties()['image'.$i])) {
                 continue;
             }
@@ -373,7 +351,7 @@ class BadgeGenerator
             $height    = ArrayHelper::getValue('height', $badge->getProperties()['image'.$i], 100);
             $align     = ArrayHelper::getValue('align', $badge->getProperties()['image'.$i], 'C');
             $rounded   = ArrayHelper::getValue('rounded', $badge->getProperties()['image'.$i], false);
-            if ($align !== 'C') {
+            if ('C' !== $align) {
                 $align = '';
             }
 
@@ -409,10 +387,10 @@ class BadgeGenerator
                     default:
                         $type = 'JPG';
                 }
-//Start Graphic Transformation
+                //Start Graphic Transformation
                 // $pdf->StartTransform();
 
-// set clipping mask
+                // set clipping mask
                 //  $pdf->Circle($positionX+($width/2), ($height/2)+$positionY, ($width/2)-20, 0,360,  'CNZ', [], [255,255,2]);
                 $pdf->Image(
                     $image,
@@ -436,16 +414,13 @@ class BadgeGenerator
             }
 
             //$pdf->StopTransform();
-
         }
-
 
         /*$pdf->SetXY(0, $badge->getProperties()['text2']['position']);
         $hex = '#'.$badge->getProperties()['text2']['color'];
         list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
         $pdf->SetTextColor($r, $g, $b);
         $pdf->Cell($width, 50, $this->getCustomText('text2'), 0, 0, 'C');*/
-
 
         // Stage auto mapping
         if ($this->contact) {
@@ -459,6 +434,7 @@ class BadgeGenerator
                 $this->leadModel->saveEntity($this->contact);
             }
         }
+
         return $pdf;
     }
 
@@ -491,7 +467,7 @@ class BadgeGenerator
         $image  = $this->getCustomTextFromFields($block, $default);
         $fields = $this->getFields($block);
         $field  = reset($fields);
-        if ($this->contact && $field == 'country' && $image) {
+        if ($this->contact && 'country' == $field && $image) {
             if ($flagImage = $this->assetsHelper->getCountryFlag($image, true)) {
                 $image = $this->coreParametersHelper->getParameter('site_url').$flagImage;
             }
@@ -557,7 +533,6 @@ class BadgeGenerator
         return $fields;
     }
 
-
     /**
      * @return string
      */
@@ -565,7 +540,7 @@ class BadgeGenerator
     {
         $preferred = $this->contact->getPreferredProfileImage();
 
-        if ($preferred == 'custom') {
+        if ('custom' == $preferred) {
             $avatarPath = $this->getAvatarPath(true).'/avatar'.$this->contact->getId();
             if (file_exists($avatarPath) && $fmtime = filemtime($avatarPath)) {
                 // Append file modified time to ensure the latest is used by browser
@@ -595,10 +570,8 @@ class BadgeGenerator
     }
 
     /**
-     * @param Lead  $contact
-     * @param Badge $badge
-     *
      * @return void
+     *
      * @throws \Exception
      */
     public function displayBadge(Lead $contact, Badge $badge)
@@ -608,10 +581,8 @@ class BadgeGenerator
     }
 
     /**
-     * @param Lead  $contact
-     * @param Badge $badge
-     *
      * @return bool
+     *
      * @throws \Exception
      */
     private function displayBasedOnSegment(Lead $contact, Badge $badge)
@@ -632,10 +603,8 @@ class BadgeGenerator
     }
 
     /**
-     * @param Lead  $contact
-     * @param Badge $badge
-     *
      * @return bool
+     *
      * @throws \Exception
      */
     private function displaBasedOnTags(Lead $contact, Badge $badge)
@@ -655,13 +624,11 @@ class BadgeGenerator
         throw new \Exception('Access denied');
     }
 
-    public function
-    Crop_ByRadius(
+    public function Crop_ByRadius(
         $source_url,
-        $Radius = "0px",
+        $Radius = '0px',
         $Keep_SourceFile = true
     ) {
-
         /*
             Output File is png, Because for crop we need transparent color
 
@@ -674,34 +641,32 @@ class BadgeGenerator
                                 50%     => 50%
         */
 
-        if ($Radius == null) {
+        if (null == $Radius) {
             return false;
         }
-
 
         $ImageInfo = getimagesize($source_url);
         $w         = $ImageInfo[0];
         $h         = $ImageInfo[1];
         $mime      = $ImageInfo['mime'];
 
-        if ($mime != "image/jpeg" && $mime != "image/jpg" && $mime != "image/png") {
+        if ('image/jpeg' != $mime && 'image/jpg' != $mime && 'image/png' != $mime) {
             return false;
         }
 
-        if (strpos($Radius, "%") !== false) {
+        if (false !== strpos($Radius, '%')) {
             //$Radius by Cent
-            $Radius        = intval(str_replace("%", "", $Radius));
+            $Radius        = intval(str_replace('%', '', $Radius));
             $Smallest_Side = $w <= $h ? $w : $h;
             $Radius        = $Smallest_Side * $Radius / 100;
-
         } else {
             $Radius = strtolower($Radius);
-            $Radius = str_replace("px", "", $Radius);
+            $Radius = str_replace('px', '', $Radius);
         }
 
         $Radius = is_numeric($Radius) ? intval($Radius) : 0;
 
-        if ($Radius == 0) {
+        if (0 == $Radius) {
             return false;
         }
         $src    = imagecreatefromstring(file_get_contents($source_url));
@@ -714,7 +679,7 @@ class BadgeGenerator
 
         /********************** Pixel step config ********************************/
 
-        $Pixel_Step_def = 0.4;//smaller step take longer time! if set $Pixel_Step=0.1 result is better than  $Pixel_Step=1 but it take longer time!
+        $Pixel_Step_def = 0.4; //smaller step take longer time! if set $Pixel_Step=0.1 result is better than  $Pixel_Step=1 but it take longer time!
 
         //We select the pixels we are sure are in range, to Take up the bigger steps and shorten the processing time
 
@@ -734,7 +699,6 @@ class BadgeGenerator
 
         $Pixel_Step = $Pixel_Step_def;
         for ($x = 0; $x < $w; $x += $Pixel_Step) {
-
             if ($Use_x_Sure && $x > $Sure_x_Start && $x < $Sure_x_End) {
                 $Pixel_Step = 1;
             } else {
@@ -771,27 +735,22 @@ class BadgeGenerator
                 $Bottom_Right = ($x < ($w - $Radius) || $y < ($h - $Radius)) || $Inner_Circle;
 
                 if ($top_Left && $top_Right && $Bottom_Left && $Bottom_Right) {
-
                     imagesetpixel($newpic, $x, $y, $c);
-
                 } else {
                     imagesetpixel($newpic, $x, $y, $transparent);
                 }
-
             }
         }
-
 
         imagesavealpha($newpic, true);
         header('Content-type: image/png');
         imagepng($newpic);
         imagedestroy($newpic);
         imagedestroy($src);
-
     }
 
     //resize and crop image by center
-    function resize_crop_image($max_width, $max_height, $source_file, $dst_dir, $quality = 80)
+    public function resize_crop_image($max_width, $max_height, $source_file, $dst_dir, $quality = 80)
     {
         $imgsize = getimagesize($source_file);
         $width   = $imgsize[0];
@@ -800,19 +759,19 @@ class BadgeGenerator
 
         switch ($mime) {
             case 'image/gif':
-                $image_create = "imagecreatefromgif";
-                $image        = "imagegif";
+                $image_create = 'imagecreatefromgif';
+                $image        = 'imagegif';
                 break;
 
             case 'image/png':
-                $image_create = "imagecreatefrompng";
-                $image        = "imagepng";
+                $image_create = 'imagecreatefrompng';
+                $image        = 'imagepng';
                 $quality      = 7;
                 break;
 
             case 'image/jpeg':
-                $image_create = "imagecreatefromjpeg";
-                $image        = "imagejpeg";
+                $image_create = 'imagecreatefromjpeg';
+                $image        = 'imagejpeg';
                 $quality      = 80;
                 break;
 

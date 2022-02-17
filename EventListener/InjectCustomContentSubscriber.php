@@ -13,7 +13,6 @@ namespace MauticPlugin\MauticBadgeGeneratorBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomContentEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -25,7 +24,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class InjectCustomContentSubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var TemplatingHelper
      */
@@ -56,25 +54,17 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
      */
     private $badgeGenerator;
 
-
     /**
      * InjectCustomContentSubscriber constructor.
-     *
-     * @param TemplatingHelper  $templatingHelper
-     * @param BadgeModel        $badgeModel
-     * @param IntegrationHelper $integrationHelper
-     * @param BadgeUrlGenerator $badgeUrlGenerator
-     * @param BadgeGenerator    $badgeGenerator
      */
     public function __construct(TemplatingHelper $templatingHelper, BadgeModel $badgeModel, IntegrationHelper $integrationHelper, BadgeUrlGenerator $badgeUrlGenerator, BadgeGenerator $badgeGenerator)
     {
-
-        $this->templatingHelper = $templatingHelper;
-        $this->badgeModel = $badgeModel;
+        $this->templatingHelper  = $templatingHelper;
+        $this->badgeModel        = $badgeModel;
         $this->integrationHelper = $integrationHelper;
-        $this->badges = $this->badgeModel->getEntities();
+        $this->badges            = $this->badgeModel->getEntities();
         $this->badgeUrlGenerator = $badgeUrlGenerator;
-        $this->badgeGenerator = $badgeGenerator;
+        $this->badgeGenerator    = $badgeGenerator;
     }
 
     public static function getSubscribedEvents()
@@ -84,9 +74,6 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CustomContentEvent $customContentEvent
-     */
     public function injectViewCustomContent(CustomContentEvent $customContentEvent)
     {
         $integration = $this->integrationHelper->getIntegrationObject('BadgeGenerator');
@@ -95,13 +82,13 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
         }
 
         $parameters = $customContentEvent->getVars();
-        if ($customContentEvent->getContext() != 'lead.grid') {
+        if ('lead.grid' != $customContentEvent->getContext()) {
             return;
-        }else if (!isset($parameters['contact']) || !$parameters['contact'] instanceof Lead) {
+        } elseif (!isset($parameters['contact']) || !$parameters['contact'] instanceof Lead) {
             return;
         }
         $contact = $parameters['contact'];
-        $badges = [];
+        $badges  = [];
         /** @var Badge $badge */
         foreach ($this->badges as $key=>$badge) {
             try {
@@ -114,14 +101,11 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
         $content = $this->templatingHelper->getTemplating()->render(
             'MauticBadgeGeneratorBundle:Badge:badges_in_grid.html.php',
             [
-                'badges'=>$badges,
-                'contact'=>$contact,
-                'badgeUrlGenerator'=>$this->badgeUrlGenerator
+                'badges'           => $badges,
+                'contact'          => $contact,
+                'badgeUrlGenerator'=> $this->badgeUrlGenerator,
             ]
         );
         $customContentEvent->addContent($content);
-
     }
-
-
 }

@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\MauticBadgeGeneratorBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeTokenReplacer;
@@ -22,7 +21,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class EmailSubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var BadgeTokenReplacer
      */
@@ -32,7 +30,6 @@ class EmailSubscriber implements EventSubscriberInterface
     {
         $this->badgeTokenReplacer = $badgeTokenReplacer;
     }
-
 
     /**
      * @return array
@@ -45,18 +42,11 @@ class EmailSubscriber implements EventSubscriberInterface
         ];
     }
 
-
-    /**
-     * @param EmailSendEvent $event
-     */
     public function onEmailDisplay(EmailSendEvent $event)
     {
         $this->onEmailGenerate($event);
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
     public function onEmailGenerate(EmailSendEvent $event)
     {
         // Combine all possible content to find tokens across them

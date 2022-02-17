@@ -22,8 +22,6 @@ class PropertiesCrate
 
     /**
      * CodeImageCrate constructor.
-     *
-     * @param array $properties
      */
     public function __construct(array $properties)
     {
@@ -64,7 +62,6 @@ class PropertiesCrate
         }
 
         return ArrayHelper::getValue('width', $this->properties, 120);
-
     }
 
     /**
@@ -90,7 +87,7 @@ class PropertiesCrate
      */
     public function getAlign()
     {
-        return ArrayHelper::getValue('align', $this->properties, 'C') == 'C' ? ArrayHelper::getValue('align', $this->properties, 'C') : '';
+        return 'C' == ArrayHelper::getValue('align', $this->properties, 'C') ? ArrayHelper::getValue('align', $this->properties, 'C') : '';
     }
 
     /**
@@ -100,5 +97,4 @@ class PropertiesCrate
     {
         return $this->properties;
     }
-
 }

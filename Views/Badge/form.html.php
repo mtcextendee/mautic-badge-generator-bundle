@@ -68,7 +68,7 @@ $item = $entity;
 <hr>
 
 <div class="row">
-    <?php for ($i = 1; $i <= $numberOfTextBlock; $i++): ?>
+    <?php for ($i = 1; $i <= $numberOfTextBlock; ++$i): ?>
         <div class="col-md-6">
             <h4><?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.text').' '.$i; ?> </h4>
             <hr>
@@ -89,7 +89,7 @@ $item = $entity;
 
 
 <div class="row">
-    <?php for ($i = 1; $i <= $numberOfImagesBlock; $i++): ?>
+    <?php for ($i = 1; $i <= $numberOfImagesBlock; ++$i): ?>
         <div class="col-md-6">
             <h4><?php echo $view['translator']->trans('mautic.plugin.badge.generator.form.image').' '.$i; ?> </h4>
             <hr>

@@ -46,10 +46,6 @@ class BadgeUploader
 
     /**
      * BadgeUploader constructor.
-     *
-     * @param FileUploader         $fileUploader
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param PathsHelper          $pathsHelper
      */
     public function __construct(
         FileUploader $fileUploader,
@@ -62,10 +58,8 @@ class BadgeUploader
     }
 
     /**
-     * @param Badge   $entity
-     * @param Request $request
-     *
      * @return mixed
+     *
      * @throws \Mautic\CoreBundle\Exception\FileUploadException
      */
     public function uploadPropertiesFiles(Badge $entity, Request $request)
@@ -73,7 +67,7 @@ class BadgeUploader
         $uploadDir  = $this->getUploadDir($entity);
         $badge      = ArrayHelper::getValue('badge', $request->files->all(), []);
         $properties = ArrayHelper::getValue('properties', $badge, []);
-        $files = [];
+        $files      = [];
         foreach ($properties as $key => $files) {
             foreach ($this->getUploadFilesName() as $fileName) {
                 /* @var UploadedFile $file */
@@ -82,8 +76,8 @@ class BadgeUploader
                 }
                 $file = $files[$fileName];
                 try {
-                    $uploadedFile            = $this->fileUploader->upload($uploadDir, $file);
-                    $properties              = $this->getEntityVar($entity, 'properties');
+                    $uploadedFile                                                         = $this->fileUploader->upload($uploadDir, $file);
+                    $properties                                                           = $this->getEntityVar($entity, 'properties');
                     $properties[$key][str_replace($this->suffixForUpload, '', $fileName)] = $uploadedFile;
                     $this->getEntityVar($entity, 'properties', 'set', $properties);
                 } catch (FileUploadException $e) {
@@ -95,10 +89,6 @@ class BadgeUploader
     }
 
     /**
-     * @param Badge   $entity
-     * @param Request $request
-     * @param Form    $form
-     *
      * @throws \Mautic\CoreBundle\Exception\FileUploadException
      */
     public function uploadFiles(Badge $entity, Request $request, Form $form)
@@ -110,7 +100,6 @@ class BadgeUploader
 
         $uploadDir = $this->getUploadDir($entity);
         foreach ($this->getUploadFilesName() as $fileName) {
-
             /* @var UploadedFile $file */
             if (empty($files[$fileName])) {
                 continue;
@@ -126,7 +115,6 @@ class BadgeUploader
     }
 
     /**
-     * @param Badge  $entity
      * @param string $fileName
      *
      * @return string
@@ -138,9 +126,6 @@ class BadgeUploader
         return $uploadDir.$fileName;
     }
 
-    /**
-     * @param Badge $entity
-     */
     public function deleteAllFilesOfBadge(Badge $entity)
     {
         $uploadDir = $this->getUploadDir($entity);
@@ -169,7 +154,7 @@ class BadgeUploader
     public function getEntityVar($entity, $key, $action = 'get', $value = '')
     {
         $var = $action.ucfirst($key);
-        if ($action == 'get') {
+        if ('get' == $action) {
             return $entity->$var();
         } else {
             $entity->$var($value);
@@ -177,8 +162,6 @@ class BadgeUploader
     }
 
     /**
-     * @param Badge $entity
-     *
      * @return string
      */
     private function getUploadDir(Badge $entity)
@@ -226,12 +209,11 @@ class BadgeUploader
      */
     public function getUploadedFiles($pattern = '*')
     {
-        $path = $this->getBadgeImagePath(true);
+        $path   = $this->getBadgeImagePath(true);
         $finder = new Finder();
+
         return $finder->files()->name($pattern)->in($path);
-
     }
-
 
     /**
      * @param string $string

@@ -1,6 +1,5 @@
 <?php
 
-
 /*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -11,6 +10,7 @@
  */
 
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Integration;
+
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -43,6 +43,7 @@ class BadgeGeneratorIntegration extends AbstractIntegration
             'requires_authorization' => false,
         ];
     }
+
     /**
      * {@inheritdoc}
      *
@@ -67,7 +68,7 @@ class BadgeGeneratorIntegration extends AbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ($formArea == 'features') {
+        if ('features' == $formArea) {
             $builder->add(
                 'disable_in_contact_list',
                 YesNoButtonGroupType::class,
@@ -78,7 +79,6 @@ class BadgeGeneratorIntegration extends AbstractIntegration
                     'data'  => isset($data['disable_in_contact_list']) ? $data['disable_in_contact_list'] : false,
                 ]
             );
-
 
             $builder->add(
                 'numberOfTextBlocks',

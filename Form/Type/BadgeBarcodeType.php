@@ -21,10 +21,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class BadgeBarcodeType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -46,7 +42,7 @@ class BadgeBarcodeType extends AbstractType
                 'label'       => 'mautic.plugin.badge.generator.form.barcode.field',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => [
-                    'class'   => 'form-control',
+                    'class'        => 'form-control',
                     'data-show-on' => '{"badge_properties_barcode_contactId_0":"checked"}',
                 ],
                 'required'    => false,
@@ -60,8 +56,8 @@ class BadgeBarcodeType extends AbstractType
             ChoiceType::class,
             [
                 'choices' => array_flip([
-                    'C'=>'mautic.core.center',
-                    ''=>'mautic.core.left',
+                    'C'=> 'mautic.core.center',
+                    '' => 'mautic.core.left',
                 ]),
                 'label'      => 'mautic.plugin.badge.generator.form.text.align',
                 'label_attr' => ['class' => 'control-label'],

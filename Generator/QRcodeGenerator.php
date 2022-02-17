@@ -26,18 +26,12 @@ class QRcodeGenerator
 
     /**
      * BarcodeGenerator constructor.
-     *
-     * @param RouterInterface $router
      */
     public function __construct(RouterInterface $router)
     {
         $this->router = $router;
     }
 
-    /**
-     * @param Fpdi            $pdf
-     * @param PropertiesCrate $propertiesCrate
-     */
     public function writeToPdf(Fpdi $pdf, PropertiesCrate $propertiesCrate, ContactFieldCrate $contactFieldCrate)
     {
         $pdf->SetXY($propertiesCrate->getPositionX(), $propertiesCrate->getPositionY());
@@ -51,11 +45,11 @@ class QRcodeGenerator
         if (!empty($properties['size'])) {
             $properties['size'] = $properties['size'] * 2;
         }
-        $modifier = http_build_query($properties,null, ',');
-        $url = $this->router->generate(
+        $modifier = http_build_query($properties, null, ',');
+        $url      = $this->router->generate(
             'mautic_qrcode_generator',
             [
-                'value' => $code,
+                'value'   => $code,
                 'options' => $modifier,
             ],
             UrlGeneratorInterface::ABSOLUTE_URL
@@ -74,5 +68,4 @@ class QRcodeGenerator
             $propertiesCrate->getAlign()
         );
     }
-
 }

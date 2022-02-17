@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\MauticBadgeGeneratorBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
@@ -23,7 +22,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class TokensSubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var BadgeModel
      */
@@ -31,8 +29,6 @@ class TokensSubscriber implements EventSubscriberInterface
 
     /**
      * TokensSubscriber constructor.
-     *
-     * @param BadgeModel $badgeModel
      */
     public function __construct(BadgeModel $badgeModel)
     {
@@ -46,14 +42,11 @@ class TokensSubscriber implements EventSubscriberInterface
     {
         return [
             EmailEvents::EMAIL_ON_BUILD   => ['onBuildBuilder', 0],
-
         ];
     }
 
     /**
-     * Add field tokens to email
-     *
-     * @param EmailBuilderEvent $event
+     * Add field tokens to email.
      */
     public function onBuildBuilder(EmailBuilderEvent $event)
     {
@@ -63,7 +56,7 @@ class TokensSubscriber implements EventSubscriberInterface
         $badges = $this->badgeModel->getEntities();
         /** @var Badge $badge */
         foreach ($badges as $badge) {
-            $tokens['{badge='.$badge->getId().'}'] = $badge->getName() .' ('.$badge->getId().')';
+            $tokens['{badge='.$badge->getId().'}'] = $badge->getName().' ('.$badge->getId().')';
         }
         if ($event->tokensRequested(array_keys($tokens))) {
             $event->addTokens(
@@ -71,6 +64,4 @@ class TokensSubscriber implements EventSubscriberInterface
             );
         }
     }
-
-
 }

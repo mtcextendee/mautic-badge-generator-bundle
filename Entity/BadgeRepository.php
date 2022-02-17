@@ -15,5 +15,4 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 
 class BadgeRepository extends CommonRepository
 {
-
 }

@@ -17,7 +17,6 @@ use Symfony\Component\Routing\RouterInterface;
 
 class BadgeUrlGenerator
 {
-
     /**
      * @var RouterInterface
      */
@@ -35,16 +34,12 @@ class BadgeUrlGenerator
 
     /**
      * BarcodeTokenReplacer constructor.
-     *
-     * @param RouterInterface    $router
-     * @param BadgeHashGenerator $badgeHashGenerator
-     * @param EncryptionHelper   $encryptionHelper
      */
     public function __construct(RouterInterface $router, BadgeHashGenerator $badgeHashGenerator, EncryptionHelper $encryptionHelper)
     {
-        $this->router = $router;
+        $this->router             = $router;
         $this->badgeHashGenerator = $badgeHashGenerator;
-        $this->encryptionHelper = $encryptionHelper;
+        $this->encryptionHelper   = $encryptionHelper;
     }
 
     /**
@@ -58,10 +53,9 @@ class BadgeUrlGenerator
         return $this->router->generate(
             'mautic_badge_generator_generate',
             [
-                'objectId' => $badgeId,
+                'objectId'  => $badgeId,
                 'contactId' => $contactId,
-                'hash' => $this->badgeHashGenerator->getHashId($contactId),
-
+                'hash'      => $this->badgeHashGenerator->getHashId($contactId),
             ],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
@@ -78,7 +72,7 @@ class BadgeUrlGenerator
             'mautic_badge_generator_image_rounded',
             [
                 'encryptImageUrl' => serialize($this->encryptionHelper->encrypt($imageUrl)),
-                'width' => $width,
+                'width'           => $width,
             ],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
