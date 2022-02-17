@@ -19,15 +19,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PageSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var BadgeTokenReplacer
-     */
-    private $badgeTokenReplacer;
+    private \MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeTokenReplacer $badgeTokenReplacer;
 
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     /**
      * PageSubscriber constructor.
@@ -41,14 +35,14 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PageEvents::PAGE_ON_DISPLAY => ['onPageDisplay', 0],
         ];
     }
 
-    public function onPageDisplay(PageDisplayEvent $event)
+    public function onPageDisplay(PageDisplayEvent $event): void
     {
         $content = $event->getContent();
         $lead    = ($this->security->isAnonymous()) ? $this->leadModel->getCurrentLead() : null;

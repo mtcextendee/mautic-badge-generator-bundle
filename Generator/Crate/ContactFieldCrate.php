@@ -15,10 +15,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class ContactFieldCrate
 {
-    /**
-     * @var Lead
-     */
-    private $contact;
+    private ?\Mautic\LeadBundle\Entity\Lead $contact;
 
     /**
      * ContactFieldCrate constructor.
@@ -32,20 +29,16 @@ class ContactFieldCrate
 
     /**
      * @param string $alias
-     *
-     * @return string
      */
-    private function getContactFieldValue($alias)
+    private function getContactFieldValue($alias): string
     {
         return $this->contact ? $this->contact->getFieldValue($alias) : $alias;
     }
 
     /**
      * @param array|string $fields
-     *
-     * @return string
      */
-    public function getCustomTextFromFields($fields)
+    public function getCustomTextFromFields($fields): string
     {
         if (!is_array($fields)) {
             $fields = [$fields];

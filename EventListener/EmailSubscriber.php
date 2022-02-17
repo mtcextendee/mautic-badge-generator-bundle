@@ -21,20 +21,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class EmailSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var BadgeTokenReplacer
-     */
-    private $badgeTokenReplacer;
+    private \MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeTokenReplacer $badgeTokenReplacer;
 
     public function __construct(BadgeTokenReplacer $badgeTokenReplacer)
     {
         $this->badgeTokenReplacer = $badgeTokenReplacer;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_ON_SEND    => ['onEmailGenerate', 0],
@@ -42,12 +36,12 @@ class EmailSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onEmailDisplay(EmailSendEvent $event)
+    public function onEmailDisplay(EmailSendEvent $event): void
     {
         $this->onEmailGenerate($event);
     }
 
-    public function onEmailGenerate(EmailSendEvent $event)
+    public function onEmailGenerate(EmailSendEvent $event): void
     {
         // Combine all possible content to find tokens across them
         $content = $event->getSubject();

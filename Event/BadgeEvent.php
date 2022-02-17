@@ -27,15 +27,12 @@ class BadgeEvent extends CommonEvent
         $this->isNew  = $isNew;
     }
 
-    /**
-     * @return Badge
-     */
-    public function getEntity()
+    public function getEntity(): object
     {
         return $this->entity;
     }
 
-    public function setEntity(Badge $entity)
+    public function setEntity(Badge $entity): void
     {
         $this->entity = $entity;
     }

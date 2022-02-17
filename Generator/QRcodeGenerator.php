@@ -19,10 +19,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class QRcodeGenerator
 {
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     /**
      * BarcodeGenerator constructor.
@@ -32,7 +29,7 @@ class QRcodeGenerator
         $this->router = $router;
     }
 
-    public function writeToPdf(Fpdi $pdf, PropertiesCrate $propertiesCrate, ContactFieldCrate $contactFieldCrate)
+    public function writeToPdf(Fpdi $pdf, PropertiesCrate $propertiesCrate, ContactFieldCrate $contactFieldCrate): void
     {
         $pdf->SetXY($propertiesCrate->getPositionX(), $propertiesCrate->getPositionY());
         $code = $contactFieldCrate->getCustomTextFromFields($propertiesCrate->getFields());

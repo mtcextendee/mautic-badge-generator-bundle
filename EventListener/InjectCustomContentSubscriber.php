@@ -24,35 +24,20 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class InjectCustomContentSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TemplatingHelper
-     */
-    private $templatingHelper;
+    private \Mautic\CoreBundle\Helper\TemplatingHelper $templatingHelper;
 
-    /**
-     * @var BadgeModel
-     */
-    private $badgeModel;
+    private \MauticPlugin\MauticBadgeGeneratorBundle\Model\BadgeModel $badgeModel;
 
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
+    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
     /**
      * @var array|\Doctrine\ORM\Tools\Pagination\Paginator
      */
     private $badges;
 
-    /**
-     * @var BadgeUrlGenerator
-     */
-    private $badgeUrlGenerator;
+    private \MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeUrlGenerator $badgeUrlGenerator;
 
-    /**
-     * @var BadgeGenerator
-     */
-    private $badgeGenerator;
+    private \MauticPlugin\MauticBadgeGeneratorBundle\Generator\BadgeGenerator $badgeGenerator;
 
     /**
      * InjectCustomContentSubscriber constructor.
@@ -67,14 +52,14 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
         $this->badgeGenerator    = $badgeGenerator;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::VIEW_INJECT_CUSTOM_CONTENT => ['injectViewCustomContent', 0],
         ];
     }
 
-    public function injectViewCustomContent(CustomContentEvent $customContentEvent)
+    public function injectViewCustomContent(CustomContentEvent $customContentEvent): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('BadgeGenerator');
         if (!$integration || !$integration->getIntegrationSettings()->getIsPublished()) {
@@ -90,7 +75,7 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
         $contact = $parameters['contact'];
         $badges  = [];
         /** @var Badge $badge */
-        foreach ($this->badges as $key=>$badge) {
+        foreach ($this->badges as $badge) {
             try {
                 $this->badgeGenerator->displayBadge($contact, $badge);
                 $badges[] = $badge;

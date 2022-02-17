@@ -22,27 +22,15 @@ use Symfony\Component\HttpFoundation\Request;
 
 class BadgeUploader
 {
-    /**
-     * @var FileUploader
-     */
-    private $fileUploader;
+    private \Mautic\CoreBundle\Helper\FileUploader $fileUploader;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var array
-     */
-    private $uploadFilesName = ['source', 'ttf_upload'];
+    private array $uploadFilesName = ['source', 'ttf_upload'];
 
-    private $suffixForUpload = '_upload';
+    private string $suffixForUpload = '_upload';
 
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
+    private \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
 
     /**
      * BadgeUploader constructor.
@@ -91,7 +79,7 @@ class BadgeUploader
     /**
      * @throws \Mautic\CoreBundle\Exception\FileUploadException
      */
-    public function uploadFiles(Badge $entity, Request $request, Form $form)
+    public function uploadFiles(Badge $entity, Request $request, Form $form): void
     {
         $files = [];
         if (isset($request->files->all()['badge'])) {
@@ -116,17 +104,15 @@ class BadgeUploader
 
     /**
      * @param string $fileName
-     *
-     * @return string
      */
-    public function getCompleteFilePath(Badge $entity, $fileName)
+    public function getCompleteFilePath(Badge $entity, $fileName): string
     {
         $uploadDir = $this->getUploadDir($entity);
 
         return $uploadDir.$fileName;
     }
 
-    public function deleteAllFilesOfBadge(Badge $entity)
+    public function deleteAllFilesOfBadge(Badge $entity): void
     {
         $uploadDir = $this->getUploadDir($entity);
         $this->fileUploader->delete($uploadDir);
@@ -161,20 +147,15 @@ class BadgeUploader
         }
     }
 
-    /**
-     * @return string
-     */
-    private function getUploadDir(Badge $entity)
+    private function getUploadDir(): string
     {
         return $this->getBadgeImagePath(true);
     }
 
     /**
      * @param bool $fullPath
-     *
-     * @return string
      */
-    private function getBadgeImagePath($fullPath = false)
+    private function getBadgeImagePath($fullPath = false): string
     {
         $imagesAbsoluteDirectory = $this->pathsHelper->getSystemPath(
             'images',
@@ -194,35 +175,19 @@ class BadgeUploader
             ).$badgesDirectory;
     }
 
-    /**
-     * @return array
-     */
-    public function getUploadFilesName()
+    public function getUploadFilesName(): array
     {
         return $this->uploadFilesName;
     }
 
     /**
      * @param string $pattern
-     *
-     * @return Finder
      */
-    public function getUploadedFiles($pattern = '*')
+    public function getUploadedFiles($pattern = '*'): \Symfony\Component\Finder\Finder
     {
         $path   = $this->getBadgeImagePath(true);
         $finder = new Finder();
 
         return $finder->files()->name($pattern)->in($path);
-    }
-
-    /**
-     * @param string $string
-     * @param string $prefix
-     *
-     * @return bool
-     */
-    private function startWith($string, $prefix)
-    {
-        return substr($string, 0, strlen($prefix)) == $prefix;
     }
 }

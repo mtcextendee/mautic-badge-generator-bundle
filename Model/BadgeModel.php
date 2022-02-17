@@ -24,20 +24,16 @@ class BadgeModel extends FormModel implements AjaxLookupModelInterface
 {
     /**
      * Retrieve the permissions base.
-     *
-     * @return string
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'lead:leads';
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return BadgeRepository
      */
-    public function getRepository()
+    public function getRepository(): \MauticPlugin\MauticBadgeGeneratorBundle\Entity\BadgeRepository
     {
         /** @var BadgeRepository $repo */
         $repo = $this->em->getRepository('MauticBadgeGeneratorBundle:Badge');
@@ -75,7 +71,7 @@ class BadgeModel extends FormModel implements AjaxLookupModelInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Badge) {
             throw new \InvalidArgumentException('Entity must be of class Badge');
@@ -142,7 +138,7 @@ class BadgeModel extends FormModel implements AjaxLookupModelInterface
      * @param int    $start
      * @param array  $options
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = [])
+    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
     {
         $results = [];
         switch ($type) {

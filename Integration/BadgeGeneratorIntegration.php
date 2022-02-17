@@ -20,23 +20,18 @@ class BadgeGeneratorIntegration extends AbstractIntegration
 {
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'BadgeGenerator';
     }
 
-    public function getIcon()
+    public function getIcon(): string
     {
         return 'plugins/MauticBadgeGeneratorBundle/Assets/img/logo.png';
     }
 
-    /**
-     * @return array
-     */
-    public function getFormSettings()
+    public function getFormSettings(): array
     {
         return [
             'requires_callback'      => false,
@@ -46,15 +41,13 @@ class BadgeGeneratorIntegration extends AbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'none';
     }
 
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return [
             'contacts_grid_to_print',
@@ -66,7 +59,7 @@ class BadgeGeneratorIntegration extends AbstractIntegration
      * @param array                                             $data
      * @param string                                            $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add(

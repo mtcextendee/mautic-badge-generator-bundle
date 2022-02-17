@@ -29,14 +29,9 @@ class BadgeController extends AbstractStandardFormController
     use EntityContactsTrait;
 
     /**
-     * @var string
-     */
-    private $source;
-
-    /**
      * {@inheritdoc}
      */
-    protected function getJsLoadMethodPrefix()
+    protected function getJsLoadMethodPrefix(): string
     {
         return 'badge.badge';
     }
@@ -44,7 +39,7 @@ class BadgeController extends AbstractStandardFormController
     /**
      * {@inheritdoc}
      */
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return 'badge.badge';
     }
@@ -52,7 +47,7 @@ class BadgeController extends AbstractStandardFormController
     /**
      * {@inheritdoc}
      */
-    protected function getRouteBase()
+    protected function getRouteBase(): string
     {
         return 'badge_generator';
     }
@@ -62,15 +57,12 @@ class BadgeController extends AbstractStandardFormController
      *
      * @return string
      */
-    protected function getSessionBase($objectId = null)
+    protected function getSessionBase($objectId = null): string
     {
         return 'badgeGenerator'.(($objectId) ? '.'.$objectId : '');
     }
 
-    /**
-     * @return string
-     */
-    protected function getControllerBase()
+    protected function getControllerBase(): string
     {
         return 'MauticBadgeGeneratorBundle:Badge';
     }
@@ -78,7 +70,7 @@ class BadgeController extends AbstractStandardFormController
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function batchDeleteAction()
+    public function batchDeleteAction(): \Symfony\Component\HttpFoundation\Response
     {
         return $this->batchDeleteStandard();
     }
@@ -99,7 +91,7 @@ class BadgeController extends AbstractStandardFormController
      *
      * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function editAction($objectId, $ignorePost = false)
+    public function editAction($objectId, $ignorePost = false): \Symfony\Component\HttpFoundation\Response
     {
         return parent::editStandard($objectId, $ignorePost);
     }
@@ -110,7 +102,7 @@ class BadgeController extends AbstractStandardFormController
      *
      * @return array|void
      */
-    protected function afterEntityClone($badge, $oldBadge)
+    protected function afterEntityClone($badge, $oldBadge): void
     {
         $this->get('session')->set('clonedSource', $oldBadge->getSource());
         $this->get('session')->set('clonedProperties', $oldBadge->getProperties());
@@ -121,10 +113,8 @@ class BadgeController extends AbstractStandardFormController
      * @param       $action
      * @param null  $objectId
      * @param bool  $isClone
-     *
-     * @return bool
      */
-    protected function beforeEntitySave($entity, Form $form, $action, $objectId = null, $isClone = false)
+    protected function beforeEntitySave($entity, Form $form, $action, $objectId = null, $isClone = false): bool
     {
         /** @var BadgeUploader $uploader */
         $uploader = $this->get('mautic.badge.uploader');
@@ -156,7 +146,7 @@ class BadgeController extends AbstractStandardFormController
      *
      * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function indexAction($page = 1)
+    public function indexAction($page = 1): \Symfony\Component\HttpFoundation\Response
     {
         return $this->indexStandard($page);
     }
@@ -174,7 +164,7 @@ class BadgeController extends AbstractStandardFormController
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction($objectId)
+    public function viewAction($objectId): \Symfony\Component\HttpFoundation\Response
     {
         //set the page we came from
         $page      = 1;
@@ -199,7 +189,7 @@ class BadgeController extends AbstractStandardFormController
      *
      * @return mixed
      */
-    protected function getViewArguments(array $args, $action)
+    protected function getViewArguments(array $args, $action): array
     {
         $viewParameters = [];
 
@@ -236,7 +226,7 @@ class BadgeController extends AbstractStandardFormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    protected function deleteAction($objectId)
+    protected function deleteAction($objectId): \Symfony\Component\HttpFoundation\Response
     {
         return $this->deleteStandard($objectId);
     }
@@ -277,7 +267,7 @@ class BadgeController extends AbstractStandardFormController
     /**
      * @return JsonResponse|Response
      */
-    public function listViewAction()
+    public function listViewAction(): \Symfony\Component\HttpFoundation\Response
     {
         $sessionVar = 'badge';
         $this->get('session')->set('mautic.'.$sessionVar.'.contact.orderby', 'l.firstname');
@@ -305,7 +295,7 @@ class BadgeController extends AbstractStandardFormController
     /**
      * @param null $encryptImageUrl
      */
-    public function imageAction($encryptImageUrl = null, $width = 400)
+    public function imageAction($encryptImageUrl = null, $width = 400): void
     {
         /** @var EncryptionHelper $encryptionHelper */
         $encryptionHelper = $this->get('mautic.helper.encryption');
@@ -314,8 +304,6 @@ class BadgeController extends AbstractStandardFormController
         /** @var RoundedImageGenerator $roundedImageGenerator */
         $roundedImageGenerator = $this->get('mautic.badge.rounded.image.generator');
         $roundedImageGenerator->generate($filename, $width);
-
-        return;
     }
 
     /**
@@ -324,7 +312,7 @@ class BadgeController extends AbstractStandardFormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function contactsAction($objectId, $page = 1)
+    public function contactsAction($objectId, $page = 1): \Symfony\Component\HttpFoundation\Response
     {
         $sessionVar = 'badge';
 
@@ -487,7 +475,6 @@ class BadgeController extends AbstractStandardFormController
 
             default:
                 return false;
-                break;
         }
 
         $dst_img = imagecreatetruecolor($max_width, $max_height);
@@ -523,7 +510,7 @@ class SimpleImage
     public $image;
     public $image_type;
 
-    public function load($filename)
+    public function load($filename): void
     {
         $image_info       = getimagesize($filename);
         $this->image_type = $image_info[2];
@@ -536,7 +523,7 @@ class SimpleImage
         }
     }
 
-    public function save($filename, $image_type=IMAGETYPE_JPEG, $compression=75, $permissions=null)
+    public function save($filename, $image_type=IMAGETYPE_JPEG, $compression=75, $permissions=null): void
     {
         if (IMAGETYPE_JPEG == $image_type) {
             imagejpeg($this->image, $filename, $compression);
@@ -550,7 +537,7 @@ class SimpleImage
         }
     }
 
-    public function output($image_type=IMAGETYPE_JPEG)
+    public function output($image_type=IMAGETYPE_JPEG): void
     {
         if (IMAGETYPE_JPEG == $image_type) {
             imagejpeg($this->image);
@@ -561,38 +548,38 @@ class SimpleImage
         }
     }
 
-    public function getWidth()
+    public function getWidth(): int
     {
         return imagesx($this->image);
     }
 
-    public function getHeight()
+    public function getHeight(): int
     {
         return imagesy($this->image);
     }
 
-    public function resizeToHeight($height)
+    public function resizeToHeight($height): void
     {
         $ratio = $height / $this->getHeight();
         $width = $this->getWidth() * $ratio;
         $this->resize($width, $height);
     }
 
-    public function resizeToWidth($width)
+    public function resizeToWidth($width): void
     {
         $ratio  = $width / $this->getWidth();
         $height = $this->getheight() * $ratio;
         $this->resize($width, $height);
     }
 
-    public function scale($scale)
+    public function scale($scale): void
     {
         $width  = $this->getWidth() * $scale / 100;
         $height = $this->getheight() * $scale / 100;
         $this->resize($width, $height);
     }
 
-    public function resize($width, $height)
+    public function resize($width, $height): void
     {
         $new_image = imagecreatetruecolor($width, $height);
         imagecopyresampled($new_image, $this->image, 0, 0, 0, 0, $width, $height, $this->getWidth(), $this->getHeight());

@@ -21,15 +21,9 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class BadgePropertiesType extends AbstractType
 {
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
+    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Component\Translation\TranslatorInterface $translator;
 
     /**
      * BadgePropertiesType constructor.
@@ -40,7 +34,7 @@ class BadgePropertiesType extends AbstractType
         $this->translator        = $translator;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('BadgeGenerator');
 

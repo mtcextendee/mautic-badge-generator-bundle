@@ -16,15 +16,9 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 
 class RoundedImageGenerator
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
+    private \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
 
     /**
      * BadgeHashGenerator constructor.
@@ -41,7 +35,7 @@ class RoundedImageGenerator
      * @param string $image
      * @param string $width
      */
-    public function generate($image, $width)
+    public function generate($image, $width): void
     {
         $pathToImage = $this->getPathToImage(md5($image.$width));
         if (!file_exists($pathToImage)) {
@@ -52,18 +46,13 @@ class RoundedImageGenerator
 
     /**
      * @param $image
-     *
-     * @return string
      */
-    private function getPathToImage($md5ofImage)
+    private function getPathToImage($md5ofImage): string
     {
         return $this->getPathToDirectory().'/'.$md5ofImage.'png';
     }
 
-    /**
-     * @return string
-     */
-    private function getPathToDirectory()
+    private function getPathToDirectory(): string
     {
         $path = $this->pathsHelper->getSystemPath('images', true).'/'.$this->coreParametersHelper->getParameter('rounded_image_directory');
         if (!file_exists($path)) {
@@ -73,7 +62,7 @@ class RoundedImageGenerator
         return $path;
     }
 
-    private function CropByRadius($source_url, $Radius='0px', $Keep_SourceFile = true)
+    private function CropByRadius($source_url, $Radius='0px')
     {
         if (null == $Radius) {
             return false;
@@ -211,7 +200,6 @@ class RoundedImageGenerator
 
             default:
                 return false;
-                break;
         }
 
         $dst_img = imagecreatetruecolor($max_width, $max_height);

@@ -29,25 +29,13 @@ class ButtonSubscriber implements EventSubscriberInterface
 
     private $objectId;
 
-    /**
-     * @var BadgeModel
-     */
-    private $badgeModel;
+    private \MauticPlugin\MauticBadgeGeneratorBundle\Model\BadgeModel $badgeModel;
 
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
+    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
-    /**
-     * @var BadgeUrlGenerator
-     */
-    private $badgeUrlGenerator;
+    private \MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeUrlGenerator $badgeUrlGenerator;
 
-    /**
-     * @var BadgeGenerator
-     */
-    private $badgeGenerator;
+    private \MauticPlugin\MauticBadgeGeneratorBundle\Generator\BadgeGenerator $badgeGenerator;
 
     private TranslatorInterface $translator;
 
@@ -63,14 +51,14 @@ class ButtonSubscriber implements EventSubscriberInterface
         $this->translator        = $translator;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS => ['injectViewButtons', 0],
         ];
     }
 
-    public function injectViewButtons(CustomButtonEvent $event)
+    public function injectViewButtons(CustomButtonEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('BadgeGenerator');
         if (!$integration || !$integration->getIntegrationSettings()->getIsPublished()) {
@@ -125,7 +113,7 @@ class ButtonSubscriber implements EventSubscriberInterface
      * @param null   $target
      * @param string $header
      */
-    private function addButtonGenerator($objectId, $btnText, $icon, $context, $priority = 1, $target = null, $header = '')
+    private function addButtonGenerator($objectId, $btnText, $icon, $context, $priority = 1, $target = null, $header = ''): void
     {
         $event    = $this->getEvent();
 
@@ -186,7 +174,7 @@ class ButtonSubscriber implements EventSubscriberInterface
     /**
      * @param mixed CustomButtonEvent
      */
-    public function setEvent($event)
+    public function setEvent($event): void
     {
         $this->event = $event;
     }
@@ -202,7 +190,7 @@ class ButtonSubscriber implements EventSubscriberInterface
     /**
      * @param mixed $objectId
      */
-    public function setObjectId($objectId)
+    public function setObjectId($objectId): void
     {
         $this->objectId = $objectId;
     }

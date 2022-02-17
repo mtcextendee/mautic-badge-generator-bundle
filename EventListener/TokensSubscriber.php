@@ -22,10 +22,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class TokensSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var BadgeModel
-     */
-    private $badgeModel;
+    private \MauticPlugin\MauticBadgeGeneratorBundle\Model\BadgeModel $badgeModel;
 
     /**
      * TokensSubscriber constructor.
@@ -35,10 +32,7 @@ class TokensSubscriber implements EventSubscriberInterface
         $this->badgeModel = $badgeModel;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_ON_BUILD   => ['onBuildBuilder', 0],
@@ -48,7 +42,7 @@ class TokensSubscriber implements EventSubscriberInterface
     /**
      * Add field tokens to email.
      */
-    public function onBuildBuilder(EmailBuilderEvent $event)
+    public function onBuildBuilder(EmailBuilderEvent $event): void
     {
         // register tokens
         $tokens = [];

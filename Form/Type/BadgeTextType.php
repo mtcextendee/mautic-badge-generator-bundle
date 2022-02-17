@@ -28,15 +28,9 @@ use Symfony\Component\Validator\Constraints\File;
 
 class BadgeTextType extends AbstractType
 {
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
+    private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
 
-    /**
-     * @var BadgeUploader
-     */
-    private $badgeUploader;
+    private \MauticPlugin\MauticBadgeGeneratorBundle\Uploader\BadgeUploader $badgeUploader;
 
     /**
      * BadgeTextType constructor.
@@ -47,7 +41,7 @@ class BadgeTextType extends AbstractType
         $this->badgeUploader = $badgeUploader;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $formModifier = function (FormInterface $form, $currentColumns) {
             $order        = [];
@@ -169,7 +163,6 @@ class BadgeTextType extends AbstractType
             ]
         );
 
-        /** @var \SplFileInfo $uploadedFile */
         $ttfs = [];
         foreach ($this->badgeUploader->getUploadedFiles('*.ttf') as $uploadedFile) {
             $filename        = $uploadedFile->getFilename();

@@ -15,10 +15,7 @@ use Mautic\CoreBundle\Helper\ArrayHelper;
 
 class PropertiesCrate
 {
-    /**
-     * @var array
-     */
-    private $properties;
+    private array $properties;
 
     /**
      * CodeImageCrate constructor.
@@ -28,10 +25,7 @@ class PropertiesCrate
         $this->properties = $properties;
     }
 
-    /**
-     * @return bool
-     */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         if (empty($this->getFields())) {
             return false;
@@ -52,10 +46,7 @@ class PropertiesCrate
         return ArrayHelper::getValue('fields', $this->properties, []);
     }
 
-    /**
-     * @return int
-     */
-    public function getWidth()
+    public function getWidth(): int
     {
         if ($size = ArrayHelper::getValue('size', $this->properties, 0)) {
             return $size;
@@ -64,10 +55,7 @@ class PropertiesCrate
         return ArrayHelper::getValue('width', $this->properties, 120);
     }
 
-    /**
-     * @return int
-     */
-    public function getHeight()
+    public function getHeight(): int
     {
         return ArrayHelper::getValue('height', $this->properties, 50);
     }
@@ -82,18 +70,12 @@ class PropertiesCrate
         return ArrayHelper::getValue('positionX', $this->properties, 0);
     }
 
-    /**
-     * @return string
-     */
-    public function getAlign()
+    public function getAlign(): string
     {
         return 'C' == ArrayHelper::getValue('align', $this->properties, 'C') ? ArrayHelper::getValue('align', $this->properties, 'C') : '';
     }
 
-    /**
-     * @return array
-     */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }

@@ -17,20 +17,11 @@ use Symfony\Component\Routing\RouterInterface;
 
 class BadgeUrlGenerator
 {
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
-    /**
-     * @var BadgeHashGenerator
-     */
-    private $badgeHashGenerator;
+    private \MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeHashGenerator $badgeHashGenerator;
 
-    /**
-     * @var EncryptionHelper
-     */
-    private $encryptionHelper;
+    private \Mautic\CoreBundle\Helper\EncryptionHelper $encryptionHelper;
 
     /**
      * BarcodeTokenReplacer constructor.
@@ -45,10 +36,8 @@ class BadgeUrlGenerator
     /**
      * @param     $badgeId
      * @param int $contactId
-     *
-     * @return string
      */
-    public function getLink($badgeId, $contactId = 0)
+    public function getLink($badgeId, $contactId = 0): string
     {
         return $this->router->generate(
             'mautic_badge_generator_generate',
@@ -63,10 +52,8 @@ class BadgeUrlGenerator
 
     /**
      * @param string $imageBlock
-     *
-     * @return string
      */
-    public function getLinkToRoundedImage($imageUrl, $width)
+    public function getLinkToRoundedImage($imageUrl, $width): string
     {
         return $this->router->generate(
             'mautic_badge_generator_image_rounded',

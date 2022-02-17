@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class BadgeRestriction extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('segment', LeadListType::class, [
             'label'      => 'mautic.plugin.badge.generator.form.restriction.segment',

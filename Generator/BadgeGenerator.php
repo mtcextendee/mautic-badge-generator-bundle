@@ -35,68 +35,32 @@ class BadgeGenerator
 
     const NUMBER_OF_DEFAULT_IMAGES_BLOCKS = 0;
 
-    /**
-     * @var BadgeModel
-     */
-    private $badgeModel;
+    private \MauticPlugin\MauticBadgeGeneratorBundle\Model\BadgeModel $badgeModel;
 
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var BadgeUploader
-     */
-    private $badgeUploader;
+    private \MauticPlugin\MauticBadgeGeneratorBundle\Uploader\BadgeUploader $badgeUploader;
 
-    /**
-     * @var Lead|null
-     */
-    private $contact;
+    private ?\Mautic\LeadBundle\Entity\Lead $contact = null;
 
-    /**
-     * @var Badge
-     */
-    private $badge;
+    private ?\MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge $badge = null;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
+    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
     /** @var string */
     private $fontName;
 
-    /**
-     * @var BarcodeGenerator
-     */
-    private $barcodeGenerator;
+    private \MauticPlugin\MauticBadgeGeneratorBundle\Generator\BarcodeGenerator $barcodeGenerator;
 
-    /**
-     * @var qrcodegenerator
-     */
-    private $QRcodeGenerator;
+    private \MauticPlugin\MauticBadgeGeneratorBundle\Generator\QRcodeGenerator $QRcodeGenerator;
 
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
+    private \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper;
 
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
+    private \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
 
-    /**
-     * @var BadgeUrlGenerator
-     */
-    private $badgeUrlGenerator;
+    private \MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeUrlGenerator $badgeUrlGenerator;
 
     /**
      * BadgeGenerator constructor.
@@ -125,10 +89,7 @@ class BadgeGenerator
         $this->badgeUrlGenerator    = $badgeUrlGenerator;
     }
 
-    /**
-     * @return array
-     */
-    private function getContactBadges(Lead $contact)
+    private function getContactBadges(Lead $contact): array
     {
         $badges        = $this->badgeModel->getEntities();
         $contactBadges = [];
@@ -145,7 +106,7 @@ class BadgeGenerator
         return $contactBadges;
     }
 
-    public function generateBatch(array $contactIds)
+    public function generateBatch(array $contactIds): void
     {
         $contacts = $this->leadModel->getEntities(
             [
@@ -163,7 +124,6 @@ class BadgeGenerator
         );
 
         $pdf = $this->loadFpdi();
-        $i   = 0;
         foreach ($contacts as $contact) {
             $contactBadges = $this->getContactBadges($contact);
             if (empty($contactBadges)) {
@@ -190,14 +150,14 @@ class BadgeGenerator
      * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
      * @throws \setasign\Fpdi\PdfReader\PdfReaderException
      */
-    public function generate($badgeId, $leadId, $hash = null, $isAdmin = false)
+    public function generate($badgeId, $leadId, $hash = null, $isAdmin = false): void
     {
         $pdf = $this->getPDF($badgeId, $leadId, $hash, $isAdmin);
         echo $pdf->Output('custom_pdf_'.time().'.pdf', 'I');
         exit;
     }
 
-    public function getPDF($badgeId, $leadId, $hash = null, $isAdmin = false)
+    public function getPDF($badgeId, $leadId, $hash = null, $isAdmin = false): \setasign\Fpdi\Tcpdf\Fpdi
     {
         $pdf = $this->loadFpdi();
 
@@ -217,7 +177,7 @@ class BadgeGenerator
      * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
      * @throws \setasign\Fpdi\PdfReader\PdfReaderException
      */
-    private function generateBadgeToPDF($badgeId, $leadId, $hash = null, $isAdmin = false, Fpdi &$pdf)
+    private function generateBadgeToPDF($badgeId, $leadId, $hash = null, $isAdmin = false, Fpdi &$pdf): \setasign\Fpdi\Tcpdf\Fpdi
     {
         if (!$badge = $this->badgeModel->getEntity($badgeId)) {
             throw new EntityNotFoundException(sprintf('Badge with ID "%s" not exist', $badgeId));
@@ -242,7 +202,7 @@ class BadgeGenerator
 
         $integration = $this->integrationHelper->getIntegrationObject('BarcodeGenerator');
 
-        $barcodeProperties = ArrayHelper::getValue('barcode', $badge->getProperties(), []);
+        ArrayHelper::getValue('barcode', $badge->getProperties(), []);
 
         $contactFieldCrate = new ContactFieldCrate($this->contact);
 
@@ -379,7 +339,6 @@ class BadgeGenerator
                     case IMG_JPG:
                         $type = 'JPG';
                         break;
-                        break;
                     case IMG_PNG:
                     case 3:
                         $type = 'PNG';
@@ -438,10 +397,7 @@ class BadgeGenerator
         return $pdf;
     }
 
-    /**
-     * @return Fpdi
-     */
-    private function loadFpdi()
+    private function loadFpdi(): \setasign\Fpdi\Tcpdf\Fpdi
     {
         $pdf = new Fpdi();
 
@@ -459,10 +415,8 @@ class BadgeGenerator
     /**
      * @param string $block
      * @param string $default
-     *
-     * @return string
      */
-    private function getCustomImage($block, $default = null)
+    private function getCustomImage($block, $default = null): string
     {
         $image  = $this->getCustomTextFromFields($block, $default);
         $fields = $this->getFields($block);
@@ -478,10 +432,8 @@ class BadgeGenerator
 
     /**
      * @param $block
-     *
-     * @return string
      */
-    private function getCustomText($block)
+    private function getCustomText($block): string
     {
         return $this->getCustomTextFromFields($block);
         //return utf8_encode('محمد فهد الحواس محمد فهد الحواس محمد فهد الحواس محمد فهد الحواس');
@@ -492,10 +444,8 @@ class BadgeGenerator
 
     /**
      * @param $alias
-     *
-     * @return string
      */
-    private function getContactFieldValue($alias, $default = null)
+    private function getContactFieldValue($alias, $default = null): ?string
     {
         $fieldValue = $this->contact ? $this->contact->getFieldValue($alias) : null;
 
@@ -504,10 +454,8 @@ class BadgeGenerator
 
     /**
      * @param string $block
-     *
-     * @return string
      */
-    private function getCustomTextFromFields($block, $default = null)
+    private function getCustomTextFromFields($block, $default = null): string
     {
         $fields = $this->getFields($block);
         $text   = [];
@@ -520,10 +468,8 @@ class BadgeGenerator
 
     /**
      * @param string $block
-     *
-     * @return array
      */
-    private function getFields($block)
+    private function getFields($block): array
     {
         $fields = $this->badge->getProperties()[$block]['fields'];
         if (!is_array($fields)) {
@@ -559,10 +505,8 @@ class BadgeGenerator
      * Get avatar path.
      *
      * @param $absolute
-     *
-     * @return string
      */
-    private function getAvatarPath($absolute = false)
+    private function getAvatarPath($absolute = false): string
     {
         $imageDir = $this->pathsHelper->getSystemPath('images', $absolute);
 
@@ -570,22 +514,18 @@ class BadgeGenerator
     }
 
     /**
-     * @return void
-     *
      * @throws \Exception
      */
-    public function displayBadge(Lead $contact, Badge $badge)
+    public function displayBadge(Lead $contact, Badge $badge): void
     {
         $this->displaBasedOnTags($contact, $badge);
         $this->displayBasedOnSegment($contact, $badge);
     }
 
     /**
-     * @return bool
-     *
      * @throws \Exception
      */
-    private function displayBasedOnSegment(Lead $contact, Badge $badge)
+    private function displayBasedOnSegment(Lead $contact, Badge $badge): bool
     {
         $restriction = ArrayHelper::getValue('restriction', $badge->getProperties(), []);
         $segments    = ArrayHelper::getValue('segment', $restriction, []);
@@ -603,11 +543,9 @@ class BadgeGenerator
     }
 
     /**
-     * @return bool
-     *
      * @throws \Exception
      */
-    private function displaBasedOnTags(Lead $contact, Badge $badge)
+    private function displaBasedOnTags(Lead $contact, Badge $badge): bool
     {
         $tags = ArrayHelper::getValue('tags', $badge->getProperties());
         if (empty($tags)) {
@@ -777,7 +715,6 @@ class BadgeGenerator
 
             default:
                 return false;
-                break;
         }
 
         $dst_img = imagecreatetruecolor($max_width, $max_height);

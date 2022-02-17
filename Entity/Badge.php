@@ -19,50 +19,28 @@ use Mautic\StageBundle\Entity\Stage;
 
 class Badge
 {
-    /**
-     * @var int
-     */
-    protected $id;
+    protected int $id;
 
-    /**
-     * @var string
-     */
-    protected $name;
+    protected ?string $name = null;
 
-    /**
-     * @var array
-     */
-    protected $properties = [];
+    protected array $properties = [];
 
-    /**
-     * @var string
-     */
-    protected $source;
+    protected ?string $source = null;
 
-    /**
-     * @var int
-     */
-    protected $width = 283;
+    protected int $width = 283;
 
-    /**
-     * @var int
-     */
-    protected $height = 425;
+    protected int $height = 425;
 
-    /**
-     * @var \DateTime
-     */
-    protected $dateAdded;
+    protected ?\DateTime $dateAdded = null;
 
-    /** @var Stage */
-    protected $stage;
+    protected ?\Mautic\StageBundle\Entity\Stage $stage = null;
 
     public function __construct()
     {
         $this->setDateAdded(new \DateTime());
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('badges')
@@ -87,7 +65,7 @@ class Badge
      *
      * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('badges')
             ->addListProperties(
@@ -107,10 +85,8 @@ class Badge
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -119,10 +95,8 @@ class Badge
      * Set name.
      *
      * @param string $name
-     *
-     * @return LeadEventLog
      */
-    public function setName($name)
+    public function setName($name): self
     {
         $this->name = $name;
 
@@ -131,10 +105,8 @@ class Badge
 
     /**
      * Get name.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -143,10 +115,8 @@ class Badge
      * Set dateAdded.
      *
      * @param \DateTime $dateAdded
-     *
-     * @return LeadEventLog
      */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded($dateAdded): self
     {
         $this->dateAdded = $dateAdded;
 
@@ -155,80 +125,63 @@ class Badge
 
     /**
      * Get dateAdded.
-     *
-     * @return \DateTime
      */
-    public function getDateAdded()
+    public function getDateAdded(): \DateTime
     {
         return $this->dateAdded;
     }
 
-    public function getCreatedBy()
+    public function getCreatedBy(): void
     {
     }
 
-    public function getHeader()
+    public function getHeader(): void
     {
     }
 
-    public function getPublishStatus()
+    public function getPublishStatus(): void
     {
     }
 
-    /**
-     * @return string
-     */
-    public function getSource()
+    public function getSource(): string
     {
         return $this->source;
     }
 
     /**
      * @param string $source
-     *
-     * @return Badge
      */
-    public function setSource($source)
+    public function setSource($source): self
     {
         $this->source = $source;
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }
 
     /**
      * @param array $properties
-     *
-     * @return Badge
      */
-    public function setProperties($properties)
+    public function setProperties($properties): self
     {
         $this->properties = $properties;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getWidth()
+    public function getWidth(): int
     {
         return $this->width;
     }
 
     /**
      * @param int $width
-     *
-     * @return Badge
      */
-    public function setWidth($width)
+    public function setWidth($width): self
     {
         $this->width = $width;
 
@@ -238,37 +191,30 @@ class Badge
     /**
      * @return height
      */
-    public function getHeight()
+    public function getHeight(): int
     {
         return $this->height;
     }
 
     /**
      * @param int $height
-     *
-     * @return Badge
      */
-    public function setHeight($height)
+    public function setHeight($height): self
     {
         $this->height = $height;
 
         return $this;
     }
 
-    /**
-     * @return Stage
-     */
-    public function getStage()
+    public function getStage(): ?\Mautic\StageBundle\Entity\Stage
     {
         return $this->stage;
     }
 
     /**
      * @param Stage $stage
-     *
-     * @return Badge
      */
-    public function setStage($stage)
+    public function setStage($stage): self
     {
         $this->stage = $stage;
 

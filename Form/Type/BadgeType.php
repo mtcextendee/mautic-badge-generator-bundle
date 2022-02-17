@@ -26,10 +26,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class BadgeType extends AbstractType
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    private \Doctrine\ORM\EntityManager $em;
 
     /**
      * BadgeType conastructor.
@@ -39,7 +36,7 @@ class BadgeType extends AbstractType
         $this->em = $em;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['properties' => 'clean']));
 
@@ -166,10 +163,7 @@ class BadgeType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'badge';
     }

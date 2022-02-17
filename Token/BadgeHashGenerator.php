@@ -17,15 +17,9 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class BadgeHashGenerator
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var CorePermissions
-     */
-    private $corePermissions;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $corePermissions;
 
     /**
      * BadgeHashGenerator constructor.
@@ -39,10 +33,8 @@ class BadgeHashGenerator
     /**
      * @param string $contactId
      * @param string $hash
-     *
-     * @return bool
      */
-    public function isValidHash($contactId, $hash)
+    public function isValidHash($contactId, $hash): bool
     {
         if ($this->corePermissions->isAdmin()) {
             return true;
@@ -57,20 +49,15 @@ class BadgeHashGenerator
 
     /**
      * @param Lead $contact
-     *
-     * @return string
      */
-    public function getHashId($contactId)
+    public function getHashId($contactId): string
     {
         $key =  $contactId.'-'.$this->coreParametersHelper->getParameter('secret_key');
 
         return hash('sha1', $key);
     }
 
-    /**
-     * @return bool
-     */
-    public function isAdmin()
+    public function isAdmin(): bool
     {
         return $this->corePermissions->isAdmin();
     }
