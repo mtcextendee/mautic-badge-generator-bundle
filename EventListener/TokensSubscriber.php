@@ -16,11 +16,12 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
 use MauticPlugin\MauticBadgeGeneratorBundle\Model\BadgeModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class TokensSubscriber.
  */
-class TokensSubscriber extends CommonSubscriber
+class TokensSubscriber implements EventSubscriberInterface
 {
 
     /**

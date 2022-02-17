@@ -17,6 +17,7 @@ use MauticPlugin\MauticBadgeGeneratorBundle\BadgeEvents;
 use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
 use MauticPlugin\MauticBadgeGeneratorBundle\Entity\BadgeRepository;
 use MauticPlugin\MauticBadgeGeneratorBundle\Event\BadgeEvent;
+use MauticPlugin\MauticBadgeGeneratorBundle\Form\Type\BadgeType;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class BadgeModel extends FormModel implements AjaxLookupModelInterface
@@ -85,7 +86,7 @@ class BadgeModel extends FormModel implements AjaxLookupModelInterface
             $options['action'] = $action;
         }
 
-        return $formFactory->create('badge', $entity, $options);
+        return $formFactory->create(BadgeType::class, $entity, $options);
     }
 
     /**

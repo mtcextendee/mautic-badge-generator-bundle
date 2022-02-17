@@ -12,8 +12,10 @@
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Form\Type;
 
 use Endroid\QrCode\ErrorCorrectionLevel;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Form\Type\LeadFieldsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -28,7 +30,7 @@ class BadgeQrcodeType extends AbstractType
     {
         $builder->add(
             'contactId',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.plugin.badge.generator.form.barcode.field.id',
                 'attr'  => [
@@ -49,26 +51,26 @@ class BadgeQrcodeType extends AbstractType
                     'data-show-on' => '{"badge_properties_qrcode_contactId_0":"checked"}',
                 ],
                 'required'    => false,
-                'empty_value' => '',
+                'placeholder' => '',
                 'multiple'    => false,
             ]
         );
 
         $builder->add(
             'align',
-            'choice',
+            ChoiceType::class,
             [
-                'choices' => [
+                'choices' => array_flip([
                     'C'=>'mautic.core.center',
                     ''=>'mautic.core.left',
-                ],
+                ]),
                 'label'      => 'mautic.plugin.badge.generator.form.text.align',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                 ],
                 'required'    => false,
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 
@@ -152,16 +154,16 @@ class BadgeQrcodeType extends AbstractType
             ]
         );
 
-        $builder->add('error_correction_level', 'choice', [
-            'choices'  => [
+        $builder->add('error_correction_level', ChoiceType::class, [
+            'choices'  => array_flip([
                 ErrorCorrectionLevel::LOW=>ErrorCorrectionLevel::LOW,
                 ErrorCorrectionLevel::QUARTILE=>ErrorCorrectionLevel::QUARTILE,
                 ErrorCorrectionLevel::MEDIUM=>ErrorCorrectionLevel::MEDIUM,
                 ErrorCorrectionLevel::HIGH=>ErrorCorrectionLevel::HIGH,
-            ],
+            ]),
             'label'    => 'mautic.plugin.barcode.form.error_correction_level',
             'required' => true,
-            'empty_value'=>false,
+            'placeholder'=>false,
             'attr'     => [
             ],
         ]);

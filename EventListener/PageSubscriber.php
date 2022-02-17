@@ -16,8 +16,9 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeTokenReplacer;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class PageSubscriber extends CommonSubscriber
+class PageSubscriber implements EventSubscriberInterface
 {
 
 

@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
+use Mautic\LeadBundle\Form\Type\TagType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticBadgeGeneratorBundle\Generator\BadgeGenerator;
 use Symfony\Component\Form\AbstractType;
@@ -92,7 +93,7 @@ class BadgePropertiesType extends AbstractType
 
             $builder->add(
                 'tags',
-                'lead_tag',
+                TagType::class,
                 [
                     'add_transformer' => true,
                     'by_reference'    => false,

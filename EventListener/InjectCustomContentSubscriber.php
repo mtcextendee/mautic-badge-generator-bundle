@@ -21,8 +21,9 @@ use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
 use MauticPlugin\MauticBadgeGeneratorBundle\Generator\BadgeGenerator;
 use MauticPlugin\MauticBadgeGeneratorBundle\Model\BadgeModel;
 use MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeUrlGenerator;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class InjectCustomContentSubscriber extends CommonSubscriber
+class InjectCustomContentSubscriber implements EventSubscriberInterface
 {
 
     /**

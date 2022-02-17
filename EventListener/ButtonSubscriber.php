@@ -21,8 +21,10 @@ use MauticPlugin\MauticBadgeGeneratorBundle\Entity\Badge;
 use MauticPlugin\MauticBadgeGeneratorBundle\Generator\BadgeGenerator;
 use MauticPlugin\MauticBadgeGeneratorBundle\Model\BadgeModel;
 use MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeUrlGenerator;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ButtonSubscriber extends CommonSubscriber
+class ButtonSubscriber implements EventSubscriberInterface
 {
     private $event;
 
@@ -48,6 +50,8 @@ class ButtonSubscriber extends CommonSubscriber
      */
     private $badgeGenerator;
 
+    private TranslatorInterface $translator;
+
     /**
      * ButtonSubscriber constructor.
      *
@@ -56,12 +60,13 @@ class ButtonSubscriber extends CommonSubscriber
      * @param BadgeUrlGenerator $badgeUrlGenerator
      * @param BadgeGenerator    $badgeGenerator
      */
-    public function __construct(BadgeModel $badgeModel, IntegrationHelper $integrationHelper, BadgeUrlGenerator $badgeUrlGenerator, BadgeGenerator $badgeGenerator)
+    public function __construct(BadgeModel $badgeModel, IntegrationHelper $integrationHelper, BadgeUrlGenerator $badgeUrlGenerator, BadgeGenerator $badgeGenerator, TranslatorInterface $translator)
     {
         $this->badgeModel = $badgeModel;
         $this->integrationHelper = $integrationHelper;
         $this->badgeUrlGenerator = $badgeUrlGenerator;
         $this->badgeGenerator = $badgeGenerator;
+        $this->translator = $translator;
     }
 
 

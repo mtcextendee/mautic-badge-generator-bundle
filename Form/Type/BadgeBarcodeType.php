@@ -11,8 +11,10 @@
 
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Form\Type\LeadFieldsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -27,7 +29,7 @@ class BadgeBarcodeType extends AbstractType
     {
         $builder->add(
             'contactId',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.plugin.badge.generator.form.barcode.field.id',
                 'attr'  => [
@@ -48,26 +50,26 @@ class BadgeBarcodeType extends AbstractType
                     'data-show-on' => '{"badge_properties_barcode_contactId_0":"checked"}',
                 ],
                 'required'    => false,
-                'empty_value' => '',
+                'placeholder' => '',
                 'multiple'    => false,
             ]
         );
 
         $builder->add(
             'align',
-            'choice',
+            ChoiceType::class,
             [
-                'choices' => [
+                'choices' => array_flip([
                     'C'=>'mautic.core.center',
                     ''=>'mautic.core.left',
-                ],
+                ]),
                 'label'      => 'mautic.plugin.badge.generator.form.text.align',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                 ],
                 'required'    => false,
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 

@@ -11,8 +11,10 @@
 
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Form\Type\LeadFieldsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -28,7 +30,7 @@ class BadgeImageType extends AbstractType
 
         $builder->add(
             'avatar',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.plugin.badge.generator.form.avatar',
                 'attr'  => [
@@ -66,7 +68,7 @@ class BadgeImageType extends AbstractType
 
         $builder->add(
             'rounded',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.plugin.badge.generator.form.rounded',
                 'attr'  => [
@@ -131,7 +133,7 @@ class BadgeImageType extends AbstractType
 
         $builder->add(
             'align',
-            'choice',
+            ChoiceType::class,
             [
                 'choices' => [
                     'C'=>'mautic.core.center',
@@ -143,7 +145,7 @@ class BadgeImageType extends AbstractType
                     'class'        => 'form-control',
                 ],
                 'required'    => false,
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 

@@ -108,7 +108,7 @@ if ($tmpl == 'index') {
                         ?>
                     </td>
                     <td>
-                        <a href="<?php echo $view['router']->generate(
+                        <a href="<?php echo $view['router']->url(
                             'mautic_badge_generator_action',
                             ['objectAction' => 'edit', 'objectId' => $item->getId()]
                         ); ?>" data-toggle="ajax">
@@ -125,7 +125,7 @@ if ($tmpl == 'index') {
                         <?php endif; ?>
                     </td>
                     <td>
-                        <a href="<?php echo $view['router']->generate(
+                        <a href="<?php echo $view['router']->url(
                             'mautic_badge_generator_generate',
                             [
                                 'objectId' => $item->getId(),
@@ -149,7 +149,7 @@ if ($tmpl == 'index') {
                     'page'       => $page,
                     'limit'      => $limit,
                     'menuLinkId' => 'mautic_badge_generator_event_index',
-                    'baseUrl'    => $view['router']->generate('mautic_badge_generator_index'),
+                    'baseUrl'    => $view['router']->url('mautic_badge_generator_index'),
                     'sessionVar' => 'badge',
                 ]
             ); ?>

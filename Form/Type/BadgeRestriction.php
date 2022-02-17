@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Form\Type;
 
+use Mautic\LeadBundle\Form\Type\LeadListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -22,7 +23,7 @@ class BadgeRestriction extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('segment', 'leadlist_choices', [
+        $builder->add('segment', LeadListType::class, [
             'label'      => 'mautic.plugin.badge.generator.form.restriction.segment',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [

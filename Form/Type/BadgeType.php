@@ -14,7 +14,10 @@ namespace MauticPlugin\MauticBadgeGeneratorBundle\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\StageBundle\Form\Type\StageListType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -77,10 +80,10 @@ class BadgeType extends AbstractType
         $builder->add(
             $builder->create(
             'stage',
-            'stage_list',
+            StageListType::class,
             [
                 'label'       => 'mautic.plugin.badge.generator.form.stage',
-                'empty_value'=> '',
+                'placeholder'=> '',
                 'multiple'=> false,
                 'required'    => false,
             ]
@@ -89,7 +92,7 @@ class BadgeType extends AbstractType
 
         $builder->add(
             'source',
-            'file',
+            FileType::class,
             [
                 'label'      => 'mautic.plugin.badge.generator.form.source',
                 'label_attr' => ['class' => 'control-label'],
@@ -169,7 +172,7 @@ class BadgeType extends AbstractType
 
         $builder->add(
             'buttons',
-            'form_buttons'
+            FormButtonsType::class
         );
     }
 

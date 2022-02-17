@@ -11,11 +11,13 @@
 
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\MauticBadgeGeneratorBundle\Uploader\BadgeUploader;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -102,7 +104,7 @@ class BadgeTextType extends AbstractType
 
         $builder->add(
             'color',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.focus.form.text_color',
                 'label_attr' => ['class' => 'control-label'],
@@ -163,7 +165,7 @@ class BadgeTextType extends AbstractType
 
         $builder->add(
             'font',
-            'choice',
+            ChoiceType::class,
             [
                 'choices'     => array_combine($coreFonts, $coreFonts),
                 'label'       => 'mautic.plugin.badge.generator.form.font',
@@ -171,7 +173,7 @@ class BadgeTextType extends AbstractType
                 'attr'        => [
                     'class' => 'form-control',
                 ],
-                'empty_value' => '',
+                'placeholder' => '',
                 'required'    => false,
             ]
         );
@@ -195,14 +197,14 @@ class BadgeTextType extends AbstractType
                     'class' => 'form-control',
                     'data-show-on' => '{"badge_properties_text'.ArrayHelper::getValue('index', $options['data'], '1').'_font":"custom"}',
                 ],
-                'empty_value' => '',
+                'placeholder' => '',
                 'required'    => false,
             ]
         );
 
         $builder->add(
             'ttf_upload',
-            'file',
+            FileType::class,
             [
                 'label'      => 'mautic.plugin.badge.generator.form.font.upload',
                 'label_attr' => ['class' => 'control-label'],
@@ -229,13 +231,13 @@ class BadgeTextType extends AbstractType
 
         $builder->add(
             'align',
-            'choice',
+            ChoiceType::class,
             [
-                'choices'     => [
+                'choices'     => array_flip([
                     'C' => 'mautic.core.center',
                     'L' => 'mautic.core.left',
                     'R' => 'mautic.core.right',
-                ],
+                ]),
                 'label'       => 'mautic.plugin.badge.generator.form.text.align',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => [
@@ -243,13 +245,13 @@ class BadgeTextType extends AbstractType
                 ],
                 'required'    => false,
                 'data'  => isset($options['data']['align']) ? $options['data']['align'] : 'L',
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 
         $builder->add(
             'rtl',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.plugin.badge.generator.form.text.rtl',
                 'attr'  => [
@@ -330,13 +332,13 @@ class BadgeTextType extends AbstractType
 
         $builder->add(
             'style',
-            'choice',
+            ChoiceType::class,
             [
-                'choices'     => [
+                'choices'     => array_flip([
                     'B' => 'mautic.plugin.badge.generator.form.text.bold',
                     'I' => 'mautic.plugin.badge.generator.form.text.italic',
                     'U' => 'mautic.plugin.badge.generator.form.text.underline',
-                ],
+                ]),
                 'label'       => 'mautic.plugin.badge.generator.form.text.style',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => [

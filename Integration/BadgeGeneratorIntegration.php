@@ -11,6 +11,7 @@
  */
 
 namespace MauticPlugin\MauticBadgeGeneratorBundle\Integration;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilder;
@@ -69,7 +70,7 @@ class BadgeGeneratorIntegration extends AbstractIntegration
         if ($formArea == 'features') {
             $builder->add(
                 'disable_in_contact_list',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.plugin.badge.generator.form.disable_in_contact_list',
                     'attr'  => [
