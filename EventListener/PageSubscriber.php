@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticBadgeGeneratorBundle\EventListener;
 
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
@@ -23,13 +24,16 @@ class PageSubscriber implements EventSubscriberInterface
 
     private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
+    private CorePermissions $security;
+
     /**
      * PageSubscriber constructor.
      */
-    public function __construct(BadgeTokenReplacer $badgeTokenReplacer, LeadModel $leadModel)
+    public function __construct(BadgeTokenReplacer $badgeTokenReplacer, LeadModel $leadModel, CorePermissions $security)
     {
         $this->badgeTokenReplacer = $badgeTokenReplacer;
         $this->leadModel          = $leadModel;
+        $this->security = $security;
     }
 
     /**

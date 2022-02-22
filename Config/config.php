@@ -22,6 +22,7 @@ return [
                 'arguments' => [
                     'mautic.badge.token.replacer',
                     'mautic.lead.model.lead',
+                    'mautic.security',
                 ],
             ],
             'mautic.badge.email.subscriber' => [
