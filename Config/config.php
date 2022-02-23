@@ -21,7 +21,7 @@ return [
                 'class'     => \MauticPlugin\MauticBadgeGeneratorBundle\EventListener\PageSubscriber::class,
                 'arguments' => [
                     'mautic.badge.token.replacer',
-                    'mautic.lead.model.lead',
+                    'mautic.tracker.contact',
                     'mautic.security',
                 ],
             ],

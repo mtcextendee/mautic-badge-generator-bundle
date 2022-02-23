@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticBadgeGeneratorBundle\EventListener;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeTokenReplacer;
@@ -22,18 +23,18 @@ class PageSubscriber implements EventSubscriberInterface
 {
     private \MauticPlugin\MauticBadgeGeneratorBundle\Token\BadgeTokenReplacer $badgeTokenReplacer;
 
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
+    private ContactTracker $contactTracker;
 
     private CorePermissions $security;
 
     /**
      * PageSubscriber constructor.
      */
-    public function __construct(BadgeTokenReplacer $badgeTokenReplacer, LeadModel $leadModel, CorePermissions $security)
+    public function __construct(BadgeTokenReplacer $badgeTokenReplacer, ContactTracker $contactTracker, CorePermissions $security)
     {
         $this->badgeTokenReplacer = $badgeTokenReplacer;
-        $this->leadModel          = $leadModel;
         $this->security = $security;
+        $this->contactTracker = $contactTracker;
     }
 
     /**
@@ -49,7 +50,7 @@ class PageSubscriber implements EventSubscriberInterface
     public function onPageDisplay(PageDisplayEvent $event): void
     {
         $content = $event->getContent();
-        $lead    = ($this->security->isAnonymous()) ? $this->leadModel->getCurrentLead() : null;
+        $lead    = ($this->security->isAnonymous()) ? $this->contactTracker->getContact() : null;
         $content = $this->badgeTokenReplacer->replaceTokens($content, $lead);
         $event->setContent($content);
     }
